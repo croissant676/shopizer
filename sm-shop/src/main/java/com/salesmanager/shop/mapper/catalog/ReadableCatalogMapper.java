@@ -1,15 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.model.catalog.catalog.Catalog;
 import com.salesmanager.core.model.catalog.category.Category;
 import com.salesmanager.core.model.common.audit.AuditSection;
@@ -21,6 +11,15 @@ import com.salesmanager.shop.model.catalog.category.ReadableCategory;
 import com.salesmanager.shop.model.store.ReadableMerchantStore;
 import com.salesmanager.shop.store.controller.store.facade.StoreFacade;
 import com.salesmanager.shop.utils.DateUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
@@ -94,11 +93,10 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
 	 * 	1
 	 * 	4
 	 * A
-	 * @param parent
-	 * @param c
-	 * @param store
-	 * @param language
-	 * @param hierarchy
+	 * @param c Add desc later.
+	 * @param store Add desc later.
+	 * @param language Add desc later.
+	 * @param hierarchy Add desc later.
 	 */
 
 	//TODO it needs to cover by unit tests
@@ -110,9 +108,7 @@ public class ReadableCatalogMapper implements Mapper<Catalog, ReadableCatalog> {
 		ReadableCategory rp = null;
 		
 		if(CollectionUtils.isNotEmpty(c.getCategories())) {
-			c.getCategories().stream().forEach(element -> {
-				processCategory(element, store, language, hierarchy, processed);
-			});
+			c.getCategories().stream().forEach(element -> processCategory(element, store, language, hierarchy, processed));
 		}
 
 		Category parent = c.getParent();

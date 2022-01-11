@@ -2,7 +2,7 @@ package com.salesmanager.shop.mapper.tax;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -105,7 +105,7 @@ public class PersistableTaxRateMapper implements Mapper<PersistableTaxRate, TaxR
 	    desc.setId(null);
 	    desc.setDescription(source.getDescription());
 	    desc.setName(source.getName());
-	    if(source.getId() != null && source.getId().longValue()>0) {
+	    if(source.getId() != null && source.getId() >0) {
 	      desc.setId(source.getId());
 	    }
 	    Language lang = languageService.getByCode(source.getLanguage());

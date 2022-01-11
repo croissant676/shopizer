@@ -9,17 +9,17 @@ import com.salesmanager.shop.model.security.ReadablePermission;
 
 public class ReadablePermissionPopulator extends AbstractDataPopulator<Permission, ReadablePermission> {
 
-  @Override
-  public ReadablePermission populate(Permission source, ReadablePermission target,
-      MerchantStore store, Language language) throws ConversionException {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    @Override
+    public ReadablePermission populate(Permission source, ReadablePermission target,
+                                       MerchantStore store, Language language) throws ConversionException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-  @Override
-  protected ReadablePermission createTarget() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    @Override
+    protected ReadablePermission createTarget() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

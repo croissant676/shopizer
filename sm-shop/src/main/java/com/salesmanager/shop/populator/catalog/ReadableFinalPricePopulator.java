@@ -1,7 +1,5 @@
 package com.salesmanager.shop.populator.catalog;
 
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
@@ -9,6 +7,7 @@ import com.salesmanager.core.model.catalog.product.price.FinalPrice;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.ReadableProductPrice;
+import org.apache.commons.lang3.Validate;
 
 public class ReadableFinalPricePopulator extends
 		AbstractDataPopulator<FinalPrice, ReadableProductPrice> {

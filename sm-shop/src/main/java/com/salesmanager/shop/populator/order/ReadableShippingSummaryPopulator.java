@@ -1,7 +1,5 @@
 package com.salesmanager.shop.populator.order;
 
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
@@ -10,6 +8,7 @@ import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.shipping.ShippingSummary;
 import com.salesmanager.shop.model.customer.ReadableDelivery;
 import com.salesmanager.shop.model.order.shipping.ReadableShippingSummary;
+import org.apache.commons.lang3.Validate;
 
 public class ReadableShippingSummaryPopulator extends
 		AbstractDataPopulator<ShippingSummary, ReadableShippingSummary> {

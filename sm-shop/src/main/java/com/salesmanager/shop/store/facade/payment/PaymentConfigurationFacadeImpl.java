@@ -1,12 +1,5 @@
 package com.salesmanager.shop.store.facade.payment;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.payments.PaymentService;
 import com.salesmanager.core.model.merchant.MerchantStore;
@@ -16,6 +9,12 @@ import com.salesmanager.shop.model.configuration.PersistableConfiguration;
 import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 import com.salesmanager.shop.store.controller.configurations.ConfigurationsFacade;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service("paymentConfigurationFacade")

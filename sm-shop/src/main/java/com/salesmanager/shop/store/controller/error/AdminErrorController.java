@@ -1,8 +1,5 @@
 package com.salesmanager.shop.store.controller.error;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,86 +20,91 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 @ControllerAdvice("com.salesmanager.shop.admin")
 public class AdminErrorController {
 
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AdminErrorController.class);
-	private static final String LOG_ERROR_MESSAGE = "Error page controller";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminErrorController.class);
+    private static final String LOG_ERROR_MESSAGE = "Error page controller";
 
-	/**
-	 * Handles specific Spring MVC internal exceptions as HTTP status 400
-	 * @param ex the actual exception
-	 * @return an error model
-	 */
-	// list of "BAD REQUEST"-related exceptions are taken over from Springs DefaultHandlerExceptionResolver
-	@ExceptionHandler({
-			MissingServletRequestParameterException.class,
-			ServletRequestBindingException.class,
-			TypeMismatchException.class,
-			HttpMessageNotReadableException.class,
-			MethodArgumentNotValidException.class,
-			MissingServletRequestPartException.class,
-			BindException.class
-	})
-	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	@Produces({MediaType.APPLICATION_JSON})
-	public ModelAndView handleBadRequest(Exception ex) {
+    /**
+     * Handles specific Spring MVC internal exceptions as HTTP status 400
+     *
+     * @param ex the actual exception
+     * @return an error model
+     */
+    // list of "BAD REQUEST"-related exceptions are taken over from Springs DefaultHandlerExceptionResolver
+    @ExceptionHandler({
+            MissingServletRequestParameterException.class,
+            ServletRequestBindingException.class,
+            TypeMismatchException.class,
+            HttpMessageNotReadableException.class,
+            MethodArgumentNotValidException.class,
+            MissingServletRequestPartException.class,
+            BindException.class
+    })
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @Produces({MediaType.APPLICATION_JSON})
+    public ModelAndView handleBadRequest(Exception ex) {
 
-		LOGGER.error(LOG_ERROR_MESSAGE,ex);
-		return createGenericErrorModel(ex);
+        LOGGER.error(LOG_ERROR_MESSAGE, ex);
+        return createGenericErrorModel(ex);
 
-	}
-    
-	@ExceptionHandler(Exception.class)
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	@Produces({MediaType.APPLICATION_JSON})
-	public ModelAndView handleException(Exception ex) {
-		
-		LOGGER.error(LOG_ERROR_MESSAGE,ex);
+    }
 
-		ModelAndView model;
-		if(ex instanceof AccessDeniedException) {
-			
-			model = new ModelAndView("error/access_denied");
-			
-		} else {
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @Produces({MediaType.APPLICATION_JSON})
+    public ModelAndView handleException(Exception ex) {
 
-			model = createGenericErrorModel(ex);
+        LOGGER.error(LOG_ERROR_MESSAGE, ex);
 
-		}
+        ModelAndView model;
+        if (ex instanceof AccessDeniedException) {
 
-		return model;
- 
-	}
+            model = new ModelAndView("error/access_denied");
 
-	@ExceptionHandler(RuntimeException.class)
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-	@Produces({MediaType.APPLICATION_JSON})
-	public ModelAndView handleRuntimeException(Exception ex) {
-		
-		LOGGER.error(LOG_ERROR_MESSAGE,ex);
-		
-		return createGenericErrorModel(ex);
+        } else {
 
-	}
-	
-	/**
-	 * Generic exception catch allpage
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value="/error", method=RequestMethod.GET)
-	public ModelAndView handleCatchAllException(Model model) {
-		
-		return new ModelAndView("error/generic_error");
+            model = createGenericErrorModel(ex);
 
-	}
+        }
 
-	private ModelAndView createGenericErrorModel(Exception ex) {
-		ModelAndView model = new ModelAndView("error/generic_error");
-		model.addObject("stackError", ExceptionUtils.getStackTrace(ex));
-		model.addObject("errMsg", ex.getMessage());
-		return model;
-	}
+        return model;
+
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @Produces({MediaType.APPLICATION_JSON})
+    public ModelAndView handleRuntimeException(Exception ex) {
+
+        LOGGER.error(LOG_ERROR_MESSAGE, ex);
+
+        return createGenericErrorModel(ex);
+
+    }
+
+    /**
+     * Generic exception catch allpage
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/error", method = RequestMethod.GET)
+    public ModelAndView handleCatchAllException(Model model) {
+
+        return new ModelAndView("error/generic_error");
+
+    }
+
+    private ModelAndView createGenericErrorModel(Exception ex) {
+        ModelAndView model = new ModelAndView("error/generic_error");
+        model.addObject("stackError", ExceptionUtils.getStackTrace(ex));
+        model.addObject("errMsg", ex.getMessage());
+        return model;
+    }
 }

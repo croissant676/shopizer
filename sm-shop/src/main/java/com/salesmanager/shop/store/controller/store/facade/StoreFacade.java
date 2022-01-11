@@ -1,9 +1,5 @@
 package com.salesmanager.shop.store.controller.store.facade;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.salesmanager.core.model.content.InputContentFile;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.merchant.MerchantStoreCriteria;
@@ -14,118 +10,120 @@ import com.salesmanager.shop.model.store.ReadableBrand;
 import com.salesmanager.shop.model.store.ReadableMerchantStore;
 import com.salesmanager.shop.model.store.ReadableMerchantStoreList;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 /**
  * Layer between shop controllers, services and API with sm-core
- * 
- * @author carlsamson
  *
+ * @author carlsamson
  */
 public interface StoreFacade {
 
-	/**
-	 * Find MerchantStore model from store code
-	 * 
-	 * @param code
-	 * @return
-	 * @throws Exception
-	 */
-	MerchantStore getByCode(HttpServletRequest request);
+    /**
+     * Find MerchantStore model from store code
+     *
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    MerchantStore getByCode(HttpServletRequest request);
 
-	MerchantStore get(String code);
+    MerchantStore get(String code);
 
-	MerchantStore getByCode(String code);
-	
-	List<Language> supportedLanguages(MerchantStore store);
+    MerchantStore getByCode(String code);
 
-	ReadableMerchantStore getByCode(String code, String lang);
+    List<Language> supportedLanguages(MerchantStore store);
 
-	ReadableMerchantStore getFullByCode(String code, String lang);
+    ReadableMerchantStore getByCode(String code, String lang);
 
-	ReadableMerchantStoreList findAll(MerchantStoreCriteria criteria, Language language, int page, int count);
+    ReadableMerchantStore getFullByCode(String code, String lang);
 
-	/**
-	 * List child stores
-	 * 
-	 * @param code
-	 * @return
-	 */
-	ReadableMerchantStoreList getChildStores(Language language, String code, int start, int count);
+    ReadableMerchantStoreList findAll(MerchantStoreCriteria criteria, Language language, int page, int count);
 
-	ReadableMerchantStore getByCode(String code, Language lang);
+    /**
+     * List child stores
+     *
+     * @param code
+     * @return
+     */
+    ReadableMerchantStoreList getChildStores(Language language, String code, int start, int count);
 
-	ReadableMerchantStore getFullByCode(String code, Language language);
+    ReadableMerchantStore getByCode(String code, Language lang);
 
-	boolean existByCode(String code);
+    ReadableMerchantStore getFullByCode(String code, Language language);
 
-	/**
-	 * List MerchantStore using various criterias
-	 * 
-	 * @param criteria
-	 * @param lang
-	 * @return
-	 * @throws Exception
-	 */
-	ReadableMerchantStoreList getByCriteria(MerchantStoreCriteria criteria, Language lang);
+    boolean existByCode(String code);
 
-	/**
-	 * Creates a brand new MerchantStore
-	 * 
-	 * @param store
-	 * @throws Exception
-	 */
-	//ReadableMerchantStore create(PersistableMerchantStore store);
-	void create(PersistableMerchantStore store);
+    /**
+     * List MerchantStore using various criterias
+     *
+     * @param criteria
+     * @param lang
+     * @return
+     * @throws Exception
+     */
+    ReadableMerchantStoreList getByCriteria(MerchantStoreCriteria criteria, Language lang);
 
-	/**
-	 * Updates an existing store
-	 * 
-	 * @param store
-	 * @throws Exception
-	 */
-	//ReadableMerchantStore update(PersistableMerchantStore store);
-	void update(PersistableMerchantStore store);
+    /**
+     * Creates a brand new MerchantStore
+     *
+     * @param store
+     * @throws Exception
+     */
+    //ReadableMerchantStore create(PersistableMerchantStore store);
+    void create(PersistableMerchantStore store);
 
-	/**
-	 * Deletes a MerchantStore based on store code
-	 * 
-	 * @param code
-	 */
-	void delete(String code);
+    /**
+     * Updates an existing store
+     *
+     * @param store
+     * @throws Exception
+     */
+    //ReadableMerchantStore update(PersistableMerchantStore store);
+    void update(PersistableMerchantStore store);
 
-	/**
-	 * Get Logo, social networks and other brand configurations
-	 * 
-	 * @param code
-	 * @return
-	 */
-	ReadableBrand getBrand(String code);
+    /**
+     * Deletes a MerchantStore based on store code
+     *
+     * @param code
+     */
+    void delete(String code);
 
-	/**
-	 * Create store brand
-	 * 
-	 * @param merchantStoreCode
-	 * @param brand
-	 */
-	void createBrand(String merchantStoreCode, PersistableBrand brand);
+    /**
+     * Get Logo, social networks and other brand configurations
+     *
+     * @param code
+     * @return
+     */
+    ReadableBrand getBrand(String code);
 
-	/**
-	 * Delete store logo
-	 */
-	void deleteLogo(String code);
+    /**
+     * Create store brand
+     *
+     * @param merchantStoreCode
+     * @param brand
+     */
+    void createBrand(String merchantStoreCode, PersistableBrand brand);
 
-	/**
-	 * Add MerchantStore logo
-	 * 
-	 * @param code
-	 * @param cmsContentImage
-	 */
-	void addStoreLogo(String code, InputContentFile cmsContentImage);
+    /**
+     * Delete store logo
+     */
+    void deleteLogo(String code);
 
-	/**
-	 * Returns store id, code and name only
-	 * 
-	 * @return
-	 */
-	List<ReadableMerchantStore> getMerchantStoreNames(MerchantStoreCriteria criteria);
+    /**
+     * Add MerchantStore logo
+     *
+     * @param code
+     * @param cmsContentImage
+     */
+    void addStoreLogo(String code, InputContentFile cmsContentImage);
+
+    /**
+     * Returns store id, code and name only
+     *
+     * @return
+     */
+    List<ReadableMerchantStore> getMerchantStoreNames(MerchantStoreCriteria criteria);
 
 }

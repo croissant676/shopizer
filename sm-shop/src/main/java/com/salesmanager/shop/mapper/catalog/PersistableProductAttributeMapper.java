@@ -1,16 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.catalog.product.attribute.ProductOptionService;
@@ -23,9 +12,14 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.catalog.product.attribute.PersistableProductAttribute;
-import com.salesmanager.shop.model.catalog.product.attribute.PersistableProductOptionValue;
-import com.salesmanager.shop.model.catalog.product.attribute.ProductOptionValueDescription;
 import com.salesmanager.shop.store.api.exception.ConversionRuntimeException;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.UUID;
 
 @Component
 public class PersistableProductAttributeMapper implements Mapper<PersistableProductAttribute, ProductAttribute> {
@@ -64,10 +58,10 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		}
 		
 		ProductOptionValue productOptionValue = null;
-		
-		if(!StringUtils.isBlank(source.getOptionValue().getCode())) {
+
+		if (!StringUtils.isBlank(source.getOptionValue().getCode())) {
 			productOptionValue = productOptionValueService.getByCode(store, source.getOptionValue().getCode());
-		} else if(source.getProductId() != null && source.getOptionValue().getId().longValue()>0) {
+		} else if (source.getProductId() != null && source.getOptionValue().getId() > 0) {
 			productOptionValue = productOptionValueService.getById(source.getOptionValue().getId());
 		} else {
 			//ProductOption value is text
@@ -89,16 +83,8 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		if(productOptionValue==null && ! source.isAttributeDisplayOnly()) {
 			throw new ConversionRuntimeException("Product option value id " + source.getOptionValue().getId() + " does not exist");
 		}
-		
 
-			
-		/**
-			productOptionValue
-			.getDescriptions().stream()
-			.map(val -> this.persistableProductOptionValueMapper.convert(val, store, language)).collect(Collectors.toList());
-			
-		}**/
-		
+
 		if(productOption.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
 			throw new ConversionRuntimeException("Invalid product option id ");
 		}
@@ -106,17 +92,17 @@ public class PersistableProductAttributeMapper implements Mapper<PersistableProd
 		if(productOptionValue!=null && productOptionValue.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
 			throw new ConversionRuntimeException("Invalid product option value id ");
 		}
-		
-		if(source.getProductId() != null && source.getProductId().longValue() >0 ) {
+
+		if (source.getProductId() != null && source.getProductId() > 0) {
 			Product p = productService.getById(source.getProductId());
-			if(p == null) {
+			if (p == null) {
 				throw new ConversionRuntimeException("Invalid product id ");
 			}
 			destination.setProduct(p);
 		}
 
-		
-		if(destination.getId()!=null && destination.getId().longValue()>0) {
+
+		if (destination.getId() != null && destination.getId() > 0) {
 			destination.setId(destination.getId());
 		} else {
 			destination.setId(null);

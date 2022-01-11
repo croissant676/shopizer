@@ -1,17 +1,5 @@
 package com.salesmanager.shop.store.facade.items;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
@@ -30,6 +18,16 @@ import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 import com.salesmanager.shop.store.controller.items.facade.ProductItemsFacade;
 import com.salesmanager.shop.utils.ImageFilePath;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ProductItemsFacadeImpl implements ProductItemsFacade {
@@ -64,7 +62,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 		
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		
 		
 		ReadableProductList productList = new ReadableProductList();
@@ -102,7 +100,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 		
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		
 		
 		ReadableProductList productList = new ReadableProductList();
@@ -115,7 +113,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 		}
 		
 		productList.setNumber(Math.toIntExact(products.getTotalCount()));
-		productList.setRecordsTotal(new Long(products.getTotalCount()));
+		productList.setRecordsTotal(products.getTotalCount());
 
 		return productList;
 	}
@@ -191,7 +189,7 @@ public class ProductItemsFacadeImpl implements ProductItemsFacade {
 		ProductRelationship relationship = null;
 		List<ProductRelationship> relationships = productRelationshipService.getByType(store, product, group);
 
-		for(ProductRelationship r : relationships) {
+		for(ProductRelationship r : relationships) { // Relationship is always null..
 			if(r.getRelatedProduct().getId().longValue()==product.getId().longValue()) {
 				productRelationshipService.delete(relationship);
 			}

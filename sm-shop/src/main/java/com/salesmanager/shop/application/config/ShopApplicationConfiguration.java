@@ -1,14 +1,10 @@
 package com.salesmanager.shop.application.config;
 
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
-import static org.springframework.http.MediaType.IMAGE_GIF;
-import static org.springframework.http.MediaType.IMAGE_JPEG;
-import static org.springframework.http.MediaType.IMAGE_PNG;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
+import com.salesmanager.core.business.configuration.CoreApplicationConfiguration;
+import com.salesmanager.shop.filter.CorsFilter;
+import com.salesmanager.shop.filter.StoreFilter;
+import com.salesmanager.shop.filter.XssFilter;
+import com.salesmanager.shop.utils.LabelUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,11 +27,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import com.salesmanager.core.business.configuration.CoreApplicationConfiguration;
-import com.salesmanager.shop.filter.CorsFilter;
-import com.salesmanager.shop.filter.StoreFilter;
-import com.salesmanager.shop.filter.XssFilter;
-import com.salesmanager.shop.utils.LabelUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+import static org.springframework.http.MediaType.IMAGE_GIF;
+import static org.springframework.http.MediaType.IMAGE_JPEG;
+import static org.springframework.http.MediaType.IMAGE_PNG;
 
 @Configuration
 @ComponentScan({"com.salesmanager.shop"})
@@ -54,14 +53,11 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
 
   @Bean
   public FilterRegistrationBean<XssFilter> croseSiteFilter(){
-      FilterRegistrationBean<XssFilter> registrationBean 
-        = new FilterRegistrationBean<>();
-          
+    FilterRegistrationBean<XssFilter> registrationBean = new FilterRegistrationBean<>();
       registrationBean.setFilter(new XssFilter());
       registrationBean.addUrlPatterns("/shop/**");
       registrationBean.addUrlPatterns("/api/**");
       registrationBean.addUrlPatterns("/customer/**");
-          
       return registrationBean;    
   }
 
@@ -86,7 +82,6 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
         .addPathPatterns("/shop/**")
         // customer section filter
         .addPathPatterns("/customer/**");
-
     registry
         .addInterceptor(corsFilter())
         // public services cors filter
@@ -99,7 +94,6 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
   @Bean
   public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
     List<MediaType> supportedMediaTypes = Arrays.asList(IMAGE_JPEG, IMAGE_GIF, IMAGE_PNG, APPLICATION_OCTET_STREAM);
-
     ByteArrayHttpMessageConverter byteArrayHttpMessageConverter =
         new ByteArrayHttpMessageConverter();
     byteArrayHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
@@ -131,8 +125,7 @@ public class ShopApplicationConfiguration implements WebMvcConfigurer {
 
   @Bean
   public ReloadableResourceBundleMessageSource messageSource() {
-    ReloadableResourceBundleMessageSource messageSource =
-        new ReloadableResourceBundleMessageSource();
+    ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
     messageSource.setBasenames(
         "classpath:bundles/shopizer",
         "classpath:bundles/messages",

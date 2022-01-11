@@ -6,6 +6,6 @@ import com.salesmanager.shop.model.system.Configs;
 
 public interface MerchantConfigurationFacade {
 
-  Configs getMerchantConfig(MerchantStore merchantStore, Language language);
+    Configs getMerchantConfig(MerchantStore merchantStore, Language language);
 
 }

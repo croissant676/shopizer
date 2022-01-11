@@ -1,57 +1,47 @@
 package com.salesmanager.shop.store.api.v1.product;
 
+import com.salesmanager.core.business.services.catalog.product.ProductService;
+import com.salesmanager.core.business.services.catalog.product.review.ProductReviewService;
+import com.salesmanager.core.model.catalog.product.Product;
+import com.salesmanager.core.model.merchant.MerchantStore;
+import com.salesmanager.core.model.reference.language.Language;
+import com.salesmanager.shop.model.catalog.product.ReadableProduct;
+import com.salesmanager.shop.store.controller.product.facade.ProductFacade;
+import com.salesmanager.shop.store.controller.store.facade.StoreFacade;
+import com.salesmanager.shop.utils.LanguageUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import com.salesmanager.core.business.services.catalog.product.ProductService;
-import com.salesmanager.core.business.services.catalog.product.review.ProductReviewService;
-import com.salesmanager.core.model.catalog.product.Product;
-import com.salesmanager.core.model.catalog.product.review.ProductReview;
-import com.salesmanager.core.model.merchant.MerchantStore;
-import com.salesmanager.core.model.reference.language.Language;
-import com.salesmanager.shop.constants.Constants;
-import com.salesmanager.shop.model.catalog.product.PersistableProductReview;
-import com.salesmanager.shop.model.catalog.product.ReadableProduct;
-import com.salesmanager.shop.model.catalog.product.ReadableProductReview;
-import com.salesmanager.shop.store.controller.product.facade.ProductFacade;
-import com.salesmanager.shop.store.controller.store.facade.StoreFacade;
-import com.salesmanager.shop.utils.LanguageUtils;
-
-import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Controller
 @RequestMapping("/api/v1")
 public class ProductRelationshipApi {
 
-  @Inject private ProductFacade productFacade;
-
-  @Inject private StoreFacade storeFacade;
-
-  @Inject private LanguageUtils languageUtils;
-
-  @Inject private ProductService productService;
-
-  @Inject private ProductReviewService productReviewService;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProductRelationshipApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductRelationshipApi.class);
+    @Inject
+    private ProductFacade productFacade;
+    @Inject
+    private StoreFacade storeFacade;
+    @Inject
+    private LanguageUtils languageUtils;
+    @Inject
+    private ProductService productService;
+    @Inject
+    private ProductReviewService productReviewService;
 
   /*	@RequestMapping( value={"/private/products/{id}/related","/auth/products/{id}/related"}, method=RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
@@ -96,51 +86,51 @@ public class ProductRelationshipApi {
   	}
   }*/
 
-  @RequestMapping(value = "/products/{id}/related", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ApiOperation(
-      httpMethod = "GET",
-      value =
-          "Get product related items. This is used for doing cross-sell and up-sell functionality on a product details page",
-      notes = "",
-      produces = "application/json",
-      response = List.class)
-  @ResponseBody
-  @ApiImplicitParams({
-      @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-      @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
-  })
-  public List<ReadableProduct> getAll(
-      @PathVariable final Long id,
-      @ApiIgnore MerchantStore merchantStore,
-      @ApiIgnore Language language,
-      HttpServletResponse response)
-      throws Exception {
+    @RequestMapping(value = "/products/{id}/related", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(
+            httpMethod = "GET",
+            value =
+                    "Get product related items. This is used for doing cross-sell and up-sell functionality on a product details page",
+            notes = "",
+            produces = "application/json",
+            response = List.class)
+    @ResponseBody
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")
+    })
+    public List<ReadableProduct> getAll(
+            @PathVariable final Long id,
+            @ApiIgnore MerchantStore merchantStore,
+            @ApiIgnore Language language,
+            HttpServletResponse response)
+            throws Exception {
 
-    try {
-      // product exist
-      Product product = productService.getById(id);
+        try {
+            // product exist
+            Product product = productService.getById(id);
 
-      if (product == null) {
-        response.sendError(404, "Product id " + id + " does not exists");
-        return null;
-      }
+            if (product == null) {
+                response.sendError(404, "Product id " + id + " does not exists");
+                return null;
+            }
 
-      List<ReadableProduct> relatedItems =
-          productFacade.relatedItems(merchantStore, product, language);
+            List<ReadableProduct> relatedItems =
+                    productFacade.relatedItems(merchantStore, product, language);
 
-      return relatedItems;
+            return relatedItems;
 
-    } catch (Exception e) {
-      LOGGER.error("Error while getting product reviews", e);
-      try {
-        response.sendError(503, "Error while getting product reviews" + e.getMessage());
-      } catch (Exception ignore) {
-      }
+        } catch (Exception e) {
+            LOGGER.error("Error while getting product reviews", e);
+            try {
+                response.sendError(503, "Error while getting product reviews" + e.getMessage());
+            } catch (Exception ignore) {
+            }
 
-      return null;
+            return null;
+        }
     }
-  }
 
   /*
   @RequestMapping( value={"/private/products/{id}/reviews/{reviewid}","/auth/products/{id}/reviews/{reviewid}"}, method=RequestMethod.PUT)

@@ -1,10 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.util.Set;
-
-import org.jsoup.helper.Validate;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.model.catalog.product.attribute.ProductOption;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionValue;
@@ -16,6 +11,10 @@ import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.catalog.product.attribute.ReadableProductOption;
 import com.salesmanager.shop.model.catalog.product.attribute.ReadableProductOptionValue;
 import com.salesmanager.shop.model.catalog.product.variation.ReadableProductVariation;
+import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 public class ReadableProductVariationMapper implements Mapper<ProductVariation, ReadableProductVariation> {
@@ -30,23 +29,16 @@ public class ReadableProductVariationMapper implements Mapper<ProductVariation, 
 	@Override
 	public ReadableProductVariation merge(ProductVariation source, ReadableProductVariation destination,
 										  MerchantStore store, Language language) {
-		
 		Validate.notNull(source,"ProductVariation must not be null");
 		Validate.notNull(destination,"ReadableProductVariation must not be null");
-		
-		
 		destination.setId(source.getId());
 		destination.setCode(source.getCode());
-
-		
 		destination.setOption(this.option(source.getOption(), language));
 		destination.setOptionValue(this.optionValue(source.getProductOptionValue(), store, language));
-
 		return destination;
 	}
 	
 	private ReadableProductOption option (ProductOption option, Language lang) {
-
 		ReadableProductOption opt = new ReadableProductOption();
 		opt.setCode(option.getCode());
 		opt.setId(option.getId());
@@ -57,7 +49,6 @@ public class ReadableProductVariationMapper implements Mapper<ProductVariation, 
 		if(desc != null) {
 			opt.setName(desc.getName());
 		}
-
 		return opt;
 	}
 	

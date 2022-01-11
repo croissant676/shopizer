@@ -1,11 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.helper.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.services.reference.language.LanguageService;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionValue;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionValueDescription;
@@ -13,8 +7,12 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.catalog.product.attribute.PersistableProductOptionValue;
-import com.salesmanager.shop.model.catalog.product.attribute.api.PersistableProductOptionValueEntity;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PersistableProductOptionValueMapper
@@ -31,10 +29,10 @@ public class PersistableProductOptionValueMapper
 		desc.setId(null);
 		desc.setDescription(description.getDescription());
 		desc.setName(description.getName());
-		if(StringUtils.isBlank(desc.getName())) {
+		if (StringUtils.isBlank(desc.getName())) {
 			desc.setName(description.getDescription());
 		}
-		if (description.getId() != null && description.getId().longValue() > 0) {
+		if (description.getId() != null && description.getId() > 0) {
 			desc.setId(description.getId());
 		}
 		Language lang = languageService.getByCode(description.getLanguage());
@@ -48,15 +46,12 @@ public class PersistableProductOptionValueMapper
 		if (destination == null) {
 			destination = new ProductOptionValue();
 		}
-
 		try {
-			
 			if(StringUtils.isBlank(source.getCode())) {
 				if(!StringUtils.isBlank(destination.getCode())) {
 					source.setCode(destination.getCode());
 				}
 			}
-
 			if (!CollectionUtils.isEmpty(source.getDescriptions())) {
 				for (com.salesmanager.shop.model.catalog.product.attribute.ProductOptionValueDescription desc : source
 						.getDescriptions()) {
@@ -89,7 +84,6 @@ public class PersistableProductOptionValueMapper
 					//destination.getDescriptions().add(description);
 				}
 			}
-
 			destination.setCode(source.getCode());
 			destination.setMerchantStore(store);
 			destination.setProductOptionValueSortOrder(source.getSortOrder());

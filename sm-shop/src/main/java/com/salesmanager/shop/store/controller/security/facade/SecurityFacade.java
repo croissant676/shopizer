@@ -1,7 +1,8 @@
 package com.salesmanager.shop.store.controller.security.facade;
 
-import java.util.List;
 import com.salesmanager.shop.model.security.ReadablePermission;
+
+import java.util.List;
 
 public interface SecurityFacade {
   

@@ -1,5 +1,6 @@
 package com.salesmanager.shop.constants;
 
+@SuppressWarnings("unused")
 public class ApplicationConstants {
 	
 	public final static String POPULATE_TEST_DATA = "POPULATE_TEST_DATA";

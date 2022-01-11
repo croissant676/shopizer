@@ -1,12 +1,11 @@
 package com.salesmanager.shop.mapper.tax;
 
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.tax.taxclass.TaxClass;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.tax.ReadableTaxClass;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ReadableTaxClassMapper implements Mapper<TaxClass, ReadableTaxClass> {

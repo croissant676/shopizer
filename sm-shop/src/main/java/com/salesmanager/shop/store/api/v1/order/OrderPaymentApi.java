@@ -1,32 +1,5 @@
 package com.salesmanager.shop.store.api.v1.order;
 
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.services.customer.CustomerService;
 import com.salesmanager.core.business.services.order.OrderService;
@@ -48,315 +21,339 @@ import com.salesmanager.shop.populator.order.transaction.ReadableTransactionPopu
 import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.controller.order.facade.OrderFacade;
 import com.salesmanager.shop.utils.AuthorizationUtils;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/api/v1")
-@Api(tags = { "Order payment resource (Order payment Api)" })
-@SwaggerDefinition(tags = { @Tag(name = "Order payment resource", description = "Manage order payments") })
+@Api(tags = {"Order payment resource (Order payment Api)"})
+@SwaggerDefinition(tags = {@Tag(name = "Order payment resource", description = "Manage order payments")})
 public class OrderPaymentApi {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(OrderPaymentApi.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderPaymentApi.class);
 
-	@Inject
-	private CustomerService customerService;
+    @Inject
+    private CustomerService customerService;
 
-	@Inject
-	private OrderService orderService;
+    @Inject
+    private OrderService orderService;
 
-	@Inject
-	private ShoppingCartService shoppingCartService;
+    @Inject
+    private ShoppingCartService shoppingCartService;
 
-	@Inject
-	private PricingService pricingService;
+    @Inject
+    private PricingService pricingService;
 
-	@Inject
-	private PaymentService paymentService;
+    @Inject
+    private PaymentService paymentService;
 
-	@Inject
-	private OrderFacade orderFacade;
-	
-	@Inject
-	private AuthorizationUtils authorizationUtils;
+    @Inject
+    private OrderFacade orderFacade;
 
-	@RequestMapping(value = { "/cart/{code}/payment/init" }, method = RequestMethod.POST)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction init(@Valid @RequestBody PersistablePayment payment, @PathVariable String code,
-			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) throws Exception {
+    @Inject
+    private AuthorizationUtils authorizationUtils;
 
-		ShoppingCart cart = shoppingCartService.getByCode(code, merchantStore);
-		if (cart == null) {
-			throw new ResourceNotFoundException("Cart code " + code + " does not exist");
-		}
+    @RequestMapping(value = {"/cart/{code}/payment/init"}, method = RequestMethod.POST)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableTransaction init(@Valid @RequestBody PersistablePayment payment, @PathVariable String code,
+                                    @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language) throws Exception {
 
-		PersistablePaymentPopulator populator = new PersistablePaymentPopulator();
-		populator.setPricingService(pricingService);
+        ShoppingCart cart = shoppingCartService.getByCode(code, merchantStore);
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+        }
 
-		Payment paymentModel = new Payment();
+        PersistablePaymentPopulator populator = new PersistablePaymentPopulator();
+        populator.setPricingService(pricingService);
 
-		populator.populate(payment, paymentModel, merchantStore, language);
+        Payment paymentModel = new Payment();
 
-		Transaction transactionModel = paymentService.initTransaction(null, paymentModel, merchantStore);
+        populator.populate(payment, paymentModel, merchantStore, language);
 
-		ReadableTransaction transaction = new ReadableTransaction();
-		ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
-		trxPopulator.setOrderService(orderService);
-		trxPopulator.setPricingService(pricingService);
+        Transaction transactionModel = paymentService.initTransaction(null, paymentModel, merchantStore);
 
-		trxPopulator.populate(transactionModel, transaction, merchantStore, language);
+        ReadableTransaction transaction = new ReadableTransaction();
+        ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
+        trxPopulator.setOrderService(orderService);
+        trxPopulator.setPricingService(pricingService);
 
-		return transaction;
+        trxPopulator.populate(transactionModel, transaction, merchantStore, language);
 
-	}
+        return transaction;
 
-	@RequestMapping(value = { "/auth/cart/{code}/payment/init" }, method = RequestMethod.POST)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction init(@Valid @RequestBody PersistablePayment payment, @PathVariable String code,
-			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+    }
 
-		try {
-			Principal principal = request.getUserPrincipal();
-			String userName = principal.getName();
+    @RequestMapping(value = {"/auth/cart/{code}/payment/init"}, method = RequestMethod.POST)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableTransaction init(@Valid @RequestBody PersistablePayment payment, @PathVariable String code,
+                                    @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
+                                    HttpServletResponse response) throws Exception {
 
-			Customer customer = customerService.getByNick(userName);
+        try {
+            Principal principal = request.getUserPrincipal();
+            String userName = principal.getName();
 
-			if (customer == null) {
-				response.sendError(401, "Error while initializing the payment customer not authorized");
-				return null;
-			}
+            Customer customer = customerService.getByNick(userName);
 
-			ShoppingCart cart = shoppingCartService.getByCode(code, merchantStore);
-			if (cart == null) {
+            if (customer == null) {
+                response.sendError(401, "Error while initializing the payment customer not authorized");
+                return null;
+            }
 
-				throw new ResourceNotFoundException("Cart code " + code + " does not exist");
-			}
+            ShoppingCart cart = shoppingCartService.getByCode(code, merchantStore);
+            if (cart == null) {
 
-			if (cart.getCustomerId() == null) {
-				response.sendError(404, "Cart code " + code + " does not exist for exist for user " + userName);
-				return null;
-			}
+                throw new ResourceNotFoundException("Cart code " + code + " does not exist");
+            }
 
-			if (cart.getCustomerId().longValue() != customer.getId().longValue()) {
-				response.sendError(404, "Cart code " + code + " does not exist for exist for user " + userName);
-				return null;
-			}
+            if (cart.getCustomerId() == null) {
+                response.sendError(404, "Cart code " + code + " does not exist for exist for user " + userName);
+                return null;
+            }
 
-			PersistablePaymentPopulator populator = new PersistablePaymentPopulator();
-			populator.setPricingService(pricingService);
+            if (cart.getCustomerId().longValue() != customer.getId().longValue()) {
+                response.sendError(404, "Cart code " + code + " does not exist for exist for user " + userName);
+                return null;
+            }
 
-			Payment paymentModel = new Payment();
+            PersistablePaymentPopulator populator = new PersistablePaymentPopulator();
+            populator.setPricingService(pricingService);
 
-			populator.populate(payment, paymentModel, merchantStore, language);
+            Payment paymentModel = new Payment();
 
-			Transaction transactionModel = paymentService.initTransaction(customer, paymentModel, merchantStore);
+            populator.populate(payment, paymentModel, merchantStore, language);
 
-			ReadableTransaction transaction = new ReadableTransaction();
-			ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
-			trxPopulator.setOrderService(orderService);
-			trxPopulator.setPricingService(pricingService);
+            Transaction transactionModel = paymentService.initTransaction(customer, paymentModel, merchantStore);
 
-			trxPopulator.populate(transactionModel, transaction, merchantStore, language);
+            ReadableTransaction transaction = new ReadableTransaction();
+            ReadableTransactionPopulator trxPopulator = new ReadableTransactionPopulator();
+            trxPopulator.setOrderService(orderService);
+            trxPopulator.setPricingService(pricingService);
 
-			return transaction;
+            trxPopulator.populate(transactionModel, transaction, merchantStore, language);
 
-		} catch (Exception e) {
-			LOGGER.error("Error while initializing the payment", e);
-			try {
-				response.sendError(503, "Error while initializing the payment " + e.getMessage());
-			} catch (Exception ignore) {
-			}
-			return null;
-		}
-	}
+            return transaction;
 
-	@RequestMapping(value = { "/private/orders/{id}/payment/nextTransaction" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
+        } catch (Exception e) {
+            LOGGER.error("Error while initializing the payment", e);
+            try {
+                response.sendError(503, "Error while initializing the payment " + e.getMessage());
+            } catch (Exception ignore) {
+            }
+            return null;
+        }
+    }
 
-	@ResponseBody
-	@ApiImplicitParams({ 
-		    @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public String nextTransaction(
-			@PathVariable final Long id, 
-			@ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language) {
+    @RequestMapping(value = {"/private/orders/{id}/payment/nextTransaction"}, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
 
-		String user = authorizationUtils.authenticatedUser();
-		authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
-				Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+    @ResponseBody
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public String nextTransaction(
+            @PathVariable final Long id,
+            @ApiIgnore MerchantStore merchantStore,
+            @ApiIgnore Language language) {
 
-		TransactionType transactionType = orderFacade.nextTransaction(id, merchantStore);
-		return "{\"transactionType\":\"" + transactionType.name() + "\"}";
+        String user = authorizationUtils.authenticatedUser();
+        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
 
-	}
-	
-	@RequestMapping(value = { "/private/orders/{id}/payment/transactions" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.OK)
+        TransactionType transactionType = orderFacade.nextTransaction(id, merchantStore);
+        return "{\"transactionType\":\"" + transactionType.name() + "\"}";
 
-	@ResponseBody
-	@ApiImplicitParams({ 
-		    @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public List<ReadableTransaction> listTransactions(
-			@PathVariable final Long id, 
-			@ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language) {
+    }
 
-		String user = authorizationUtils.authenticatedUser();
-		authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
-				Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
+    @RequestMapping(value = {"/private/orders/{id}/payment/transactions"}, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+
+    @ResponseBody
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public List<ReadableTransaction> listTransactions(
+            @PathVariable final Long id,
+            @ApiIgnore MerchantStore merchantStore,
+            @ApiIgnore Language language) {
+
+        String user = authorizationUtils.authenticatedUser();
+        authorizationUtils.authorizeUser(user, Stream.of(Constants.GROUP_SUPERADMIN, Constants.GROUP_ADMIN,
+                Constants.GROUP_ADMIN_ORDER, Constants.GROUP_ADMIN_RETAIL).collect(Collectors.toList()), merchantStore);
 
 
-		return orderFacade.listTransactions(id, merchantStore);
+        return orderFacade.listTransactions(id, merchantStore);
 
-	}
+    }
 
-	/**
-	 * An order can be pre-authorized but un captured. This metho returns all
-	 * order subject to be capturable For a given time frame
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @param request
-	 * @param response
-	 * @return ReadableOrderList
-	 * @throws Exception
-	 */
-	@RequestMapping(value = { "/private/orders/payment/capturable" }, method = RequestMethod.GET)
-	@ResponseStatus(HttpStatus.ACCEPTED)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableOrderList listCapturableOrders(
-			@RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-			@RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-			@ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
-			HttpServletResponse response) {
+    /**
+     * An order can be pre-authorized but un captured. This metho returns all
+     * order subject to be capturable For a given time frame
+     *
+     * @param startDate
+     * @param endDate
+     * @param request
+     * @param response
+     * @return ReadableOrderList
+     * @throws Exception
+     */
+    @RequestMapping(value = {"/private/orders/payment/capturable"}, method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableOrderList listCapturableOrders(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @ApiIgnore MerchantStore merchantStore, @ApiIgnore Language language, HttpServletRequest request,
+            HttpServletResponse response) {
 
-		try {
+        try {
 
-			// if startdate or enddate are null use default range (last 24
-			// hours) DD-1 to DD
-			Calendar cal = Calendar.getInstance();
-			Date sDate = null;
+            // if startdate or enddate are null use default range (last 24
+            // hours) DD-1 to DD
+            Calendar cal = Calendar.getInstance();
+            Date sDate = null;
 
-			if (startDate != null) {
-				sDate = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-			} else {
-				cal.add(Calendar.DATE, -1);
-				sDate = cal.getTime();
-			}
+            if (startDate != null) {
+                sDate = Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            } else {
+                cal.add(Calendar.DATE, -1);
+                sDate = cal.getTime();
+            }
 
-			Date eDate = null;
+            Date eDate = null;
 
-			if (endDate != null) {
-				eDate = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-			} else {
-				eDate = new Date();
-			}
+            if (endDate != null) {
+                eDate = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            } else {
+                eDate = new Date();
+            }
 
-			ReadableOrderList returnList = orderFacade.getCapturableOrderList(merchantStore, sDate, eDate, language);
+            ReadableOrderList returnList = orderFacade.getCapturableOrderList(merchantStore, sDate, eDate, language);
 
-			return returnList;
+            return returnList;
 
-		} catch (Exception e) {
-			LOGGER.error("Error while getting capturable payments", e);
-			try {
-				response.sendError(503, "Error while getting capturable payments " + e.getMessage());
-			} catch (Exception ignore) {
-			}
-			return null;
-		}
-	}
+        } catch (Exception e) {
+            LOGGER.error("Error while getting capturable payments", e);
+            try {
+                response.sendError(503, "Error while getting capturable payments " + e.getMessage());
+            } catch (Exception ignore) {
+            }
+            return null;
+        }
+    }
 
-	/**
-	 * Capture payment transaction for a given order id
-	 *
-	 * @param id
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping(value = { "/private/orders/{id}/capture" }, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction capturePayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language) {
-		/*
-		 * try {
-		 * 
-		 * // need order Order order = orderService.getById(id);
-		 * 
-		 * if (order == null) { response.sendError(404, "Order id " + id +
-		 * " does not exist"); return null; }
-		 * 
-		 * // need customer Customer customer =
-		 * customerService.getById(order.getCustomerId());
-		 * 
-		 * if (customer == null) { response.sendError(404, "Order id " + id +
-		 * " contains an invalid customer " + order.getCustomerId()); return
-		 * null; }
-		 * 
-		 * ReadableTransaction transaction =
-		 * orderFacade.captureOrder(merchantStore, order, customer, language);
-		 * 
-		 * return transaction;
-		 * 
-		 * } catch (Exception e) { LOGGER.error("Error while capturing payment",
-		 * e); try { response.sendError(503, "Error while capturing payment " +
-		 * e.getMessage()); } catch (Exception ignore) { } return null; }
-		 */
+    /**
+     * Capture payment transaction for a given order id
+     *
+     * @param id
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = {"/private/orders/{id}/capture"}, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableTransaction capturePayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
+                                              @ApiIgnore Language language) {
+        /*
+         * try {
+         *
+         * // need order Order order = orderService.getById(id);
+         *
+         * if (order == null) { response.sendError(404, "Order id " + id +
+         * " does not exist"); return null; }
+         *
+         * // need customer Customer customer =
+         * customerService.getById(order.getCustomerId());
+         *
+         * if (customer == null) { response.sendError(404, "Order id " + id +
+         * " contains an invalid customer " + order.getCustomerId()); return
+         * null; }
+         *
+         * ReadableTransaction transaction =
+         * orderFacade.captureOrder(merchantStore, order, customer, language);
+         *
+         * return transaction;
+         *
+         * } catch (Exception e) { LOGGER.error("Error while capturing payment",
+         * e); try { response.sendError(503, "Error while capturing payment " +
+         * e.getMessage()); } catch (Exception ignore) { } return null; }
+         */
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Refund payment
-	 * 
-	 * @param id
-	 * @param merchantStore
-	 * @param language
-	 * @return
-	 */
-	@RequestMapping(value = { "/private/orders/{id}/refund" }, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction refundPayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language) {
-		return null;
-	}
+    /**
+     * Refund payment
+     *
+     * @param id
+     * @param merchantStore
+     * @param language
+     * @return
+     */
+    @RequestMapping(value = {"/private/orders/{id}/refund"}, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableTransaction refundPayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
+                                             @ApiIgnore Language language) {
+        return null;
+    }
 
-	/**
-	 * Capture payment
-	 * 
-	 * @param id
-	 * @param merchantStore
-	 * @param language
-	 * @return
-	 */
-	@RequestMapping(value = { "/private/orders/{id}/authorize" }, method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.OK)
-	@ResponseBody
-	@ApiImplicitParams({ @ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
-			@ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en") })
-	public ReadableTransaction authorizePayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
-			@ApiIgnore Language language) {
-		return null;
-	}
+    /**
+     * Capture payment
+     *
+     * @param id
+     * @param merchantStore
+     * @param language
+     * @return
+     */
+    @RequestMapping(value = {"/private/orders/{id}/authorize"}, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    @ApiImplicitParams({@ApiImplicitParam(name = "store", dataType = "String", defaultValue = "DEFAULT"),
+            @ApiImplicitParam(name = "lang", dataType = "String", defaultValue = "en")})
+    public ReadableTransaction authorizePayment(@PathVariable Long id, @ApiIgnore MerchantStore merchantStore,
+                                                @ApiIgnore Language language) {
+        return null;
+    }
 }

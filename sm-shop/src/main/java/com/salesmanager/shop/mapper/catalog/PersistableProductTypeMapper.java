@@ -1,14 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.reference.language.LanguageService;
 import com.salesmanager.core.model.catalog.product.type.ProductType;
@@ -18,6 +9,15 @@ import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.catalog.product.type.PersistableProductType;
 import com.salesmanager.shop.model.catalog.product.type.ProductTypeDescription;
 import com.salesmanager.shop.store.api.exception.ConversionRuntimeException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -89,12 +89,8 @@ public class PersistableProductTypeMapper implements Mapper<PersistableProductTy
 	}
 	
 	private com.salesmanager.core.model.catalog.product.type.ProductTypeDescription findAppropriateDescription(ProductType typeModel, String lang) {
-		java.util.Optional<com.salesmanager.core.model.catalog.product.type.ProductTypeDescription> d = typeModel.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(lang)).findFirst();
-		if(d.isPresent()) {
-			return d.get();
-		} else {
-			return null;
-		}
+		Optional<com.salesmanager.core.model.catalog.product.type.ProductTypeDescription> d = typeModel.getDescriptions().stream().filter(t -> t.getLanguage().getCode().equals(lang)).findFirst();
+		return d.orElse(null);
 	}
 
 }

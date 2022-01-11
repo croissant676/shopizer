@@ -3,34 +3,6 @@
  */
 package com.salesmanager.shop.store.controller.shoppingCart.facade;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.persistence.NoResultException;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
@@ -59,6 +31,28 @@ import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
 import com.salesmanager.shop.utils.DateUtil;
 import com.salesmanager.shop.utils.ImageFilePath;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.inject.Inject;
+import javax.persistence.NoResultException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Umesh Awasthi
@@ -1172,27 +1166,13 @@ public class ShoppingCartFacadeImpl
 		ReadableShoppingCart readableCart = null;
 
 		if(cart != null) {
-			
 
-	        readableCart = readableShoppingCartMapper.convert(cart, store, language);
-	        
-	        
-	        
-	    	if(!StringUtils.isBlank(cart.getPromoCode())) {
-	    		Date promoDateAdded = cart.getPromoAdded();//promo valid 1 day
-	    		if(promoDateAdded == null) {
-	    			promoDateAdded = new Date();
-	    		}
-	    		Instant instant = promoDateAdded.toInstant();
-	    		ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-	    		LocalDate date = zdt.toLocalDate();
-	    		//date added < date + 1 day
-	    		LocalDate tomorrow = LocalDate.now().plusDays(1);
-	    		if(date.isBefore(tomorrow)) {
-	    			readableCart.setPromoCode(cart.getPromoCode());
-	    		} 
-	    	}
-		}
+
+            readableCart = readableShoppingCartMapper.convert(cart, store, language);
+
+
+            ReadableShoppingCartMapper.checkPromoCode(cart, readableCart);
+        }
 
 		return readableCart;
 

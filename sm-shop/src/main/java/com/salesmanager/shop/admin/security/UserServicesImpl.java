@@ -22,18 +22,16 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 
 /**
- * 
  * @author casams1
- *         http://stackoverflow.com/questions/5105776/spring-security-with
- *         -custom-user-details
+ * See http://stackoverflow.com/questions/5105776/spring-security-with-custom-user-details
  */
+@SuppressWarnings("GrazieInspection")
 @Service("userDetailsService")
 public class UserServicesImpl implements WebUserServices{
 	
@@ -51,9 +49,7 @@ public class UserServicesImpl implements WebUserServices{
 	@Inject
 	@Named("passwordEncoder")
 	private PasswordEncoder passwordEncoder;
-	
 
-	
 	@Inject
 	protected PermissionService  permissionService;
 	
@@ -61,9 +57,7 @@ public class UserServicesImpl implements WebUserServices{
 	protected GroupService   groupService;
 	
 	public final static String ROLE_PREFIX = "ROLE_";
-	
-	
-	
+
 	public UserDetails loadUserByUsername(String userName)
 			throws UsernameNotFoundException, DataAccessException {
 
@@ -102,42 +96,25 @@ public class UserServicesImpl implements WebUserServices{
 			LOGGER.error("Exception while querrying user",e);
 			throw new SecurityDataAccessException("Exception while querrying user",e);
 		}
-		
-		
-		
-	
-		
-		User secUser = new User(userName, user.getAdminPassword(), user.isActive(), true,
-				true, true, authorities);
-		return secUser;
+
+		return new User(userName, user.getAdminPassword(), user.isActive(), true, true, true, authorities);
 	}
 	
 	
 	public void createDefaultAdmin() throws Exception {
-
 		  MerchantStore store = merchantStoreService.getByCode(MerchantStore.DEFAULT_STORE);
-
 		  String password = passwordEncoder.encode(DEFAULT_INITIAL_PASSWORD);
-		  
 		  List<Group> groups = groupService.listGroup(GroupType.ADMIN);
-		  
-		  //creation of the super admin admin:password)
+		  // creation of the super admin admin:password
 		  com.salesmanager.core.model.user.User user = new com.salesmanager.core.model.user.User("admin@shopizer.com",password,"admin@shopizer.com");
 		  user.setFirstName("Administrator");
 		  user.setLastName("User");
-		  
 		  for(Group group : groups) {
 			  if(group.getGroupName().equals(Constants.GROUP_SUPERADMIN) || group.getGroupName().equals(Constants.GROUP_ADMIN)) {
 				  user.getGroups().add(group);
 			  }
 		  }
-
 		  user.setMerchantStore(store);		  
 		  userService.create(user);
-		
-		
 	}
-
-
-
 }

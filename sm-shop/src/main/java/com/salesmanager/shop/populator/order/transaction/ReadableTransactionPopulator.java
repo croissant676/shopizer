@@ -1,7 +1,5 @@
 package com.salesmanager.shop.populator.order.transaction;
 
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.services.order.OrderService;
@@ -11,6 +9,7 @@ import com.salesmanager.core.model.payments.Transaction;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.order.transaction.ReadableTransaction;
 import com.salesmanager.shop.utils.DateUtil;
+import org.apache.commons.lang3.Validate;
 
 
 public class ReadableTransactionPopulator extends AbstractDataPopulator<Transaction, ReadableTransaction> {

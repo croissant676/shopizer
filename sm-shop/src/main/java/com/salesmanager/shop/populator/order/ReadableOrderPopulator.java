@@ -1,14 +1,5 @@
 package com.salesmanager.shop.populator.order;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.reference.country.CountryService;
 import com.salesmanager.core.business.services.reference.zone.ZoneService;
@@ -21,13 +12,17 @@ import com.salesmanager.core.model.order.attributes.OrderAttribute;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.customer.ReadableBilling;
 import com.salesmanager.shop.model.customer.ReadableDelivery;
-import com.salesmanager.shop.model.customer.address.Address;
 import com.salesmanager.shop.model.order.v0.ReadableOrder;
 import com.salesmanager.shop.model.store.ReadableMerchantStore;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import com.salesmanager.shop.populator.store.ReadableMerchantStorePopulator;
 import com.salesmanager.shop.utils.ImageFilePath;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ReadableOrderPopulator extends

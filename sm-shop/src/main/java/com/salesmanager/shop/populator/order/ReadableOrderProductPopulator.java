@@ -98,7 +98,7 @@ public class ReadableOrderProductPopulator extends
 					
 					ReadableProductPopulator populator = new ReadableProductPopulator();
 					populator.setPricingService(pricingService);
-					populator.setimageUtils(imageUtils);
+					populator.setImageUtils(imageUtils);
 					
 					ReadableProduct productProxy = populator.populate(product, new ReadableProduct(), store, language);
 					target.setProduct(productProxy);

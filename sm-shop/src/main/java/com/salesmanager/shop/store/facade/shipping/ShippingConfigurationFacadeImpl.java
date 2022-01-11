@@ -1,13 +1,12 @@
 package com.salesmanager.shop.store.facade.shipping;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.shop.model.configuration.PersistableConfiguration;
 import com.salesmanager.shop.model.configuration.ReadableConfiguration;
 import com.salesmanager.shop.store.controller.configurations.ConfigurationsFacade;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service("shippingConfigurationFacade")
 public class ShippingConfigurationFacadeImpl implements ConfigurationsFacade {

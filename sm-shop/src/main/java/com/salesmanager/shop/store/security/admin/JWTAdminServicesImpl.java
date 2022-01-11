@@ -1,22 +1,5 @@
 package com.salesmanager.shop.store.security.admin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.user.GroupService;
 import com.salesmanager.core.business.services.user.PermissionService;
@@ -28,87 +11,98 @@ import com.salesmanager.core.model.user.User;
 import com.salesmanager.shop.admin.security.SecurityDataAccessException;
 import com.salesmanager.shop.constants.Constants;
 import com.salesmanager.shop.store.security.user.JWTUser;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 
 @Service("jwtAdminDetailsService")
-public class JWTAdminServicesImpl implements UserDetailsService{
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(JWTAdminServicesImpl.class);
-	
-	
-	@Inject
-	private UserService userService;
-	@Inject
-	private PermissionService  permissionService;
-	@Inject
-	private GroupService   groupService;
-	
-	public final static String ROLE_PREFIX = "ROLE_";//Spring Security 4
+public class JWTAdminServicesImpl implements UserDetailsService {
 
+    public final static String ROLE_PREFIX = "ROLE_";//Spring Security 4
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAdminServicesImpl.class);
+    @Inject
+    private UserService userService;
+    @Inject
+    private PermissionService permissionService;
+    @Inject
+    private GroupService groupService;
 
-	private UserDetails userDetails(String userName, User user, Collection<GrantedAuthority> authorities) {
-        
-		AuditSection section = null;
-		section = user.getAuditSection();
-		Date lastModified = null;
-		//if(section != null) {//does not represent password change
-		//	lastModified = section.getDateModified();
-		//}
-		
-		return new JWTUser(
-        		user.getId(),
-        		userName,
-        		user.getFirstName(),
-        		user.getLastName(),
+    private UserDetails userDetails(String userName, User user, Collection<GrantedAuthority> authorities) {
+
+        AuditSection section = null;
+        section = user.getAuditSection();
+        Date lastModified = null;
+        //if(section != null) {//does not represent password change
+        //	lastModified = section.getDateModified();
+        //}
+
+        return new JWTUser(
+                user.getId(),
+                userName,
+                user.getFirstName(),
+                user.getLastName(),
                 user.getAdminEmail(),
                 user.getAdminPassword(),
                 authorities,
                 true,
                 lastModified
         );
-	}
+    }
 
-	@Override
-	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		User user = null;
-		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+    @Override
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = null;
+        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 
-		try {
-			
-				LOGGER.debug("Loading user by user id: {}", userName);
+        try {
 
-				user = userService.getByUserName(userName);
-			
-				if(user==null) {
-					//return null;
-					throw new UsernameNotFoundException("User " + userName + " not found");
-				}
+            LOGGER.debug("Loading user by user id: {}", userName);
 
-			GrantedAuthority role = new SimpleGrantedAuthority(ROLE_PREFIX + Constants.PERMISSION_AUTHENTICATED);//required to login
-			authorities.add(role); 
-			
-			List<Integer> groupsId = new ArrayList<Integer>();
-			List<Group> groups = user.getGroups();
-			for(Group group : groups) {
-				groupsId.add(group.getId());
-			}
-			
-	
-			if(CollectionUtils.isNotEmpty(groupsId)) {
-		    	List<Permission> permissions = permissionService.getPermissions(groupsId);
-		    	for(Permission permission : permissions) {
-		    		GrantedAuthority auth = new SimpleGrantedAuthority(permission.getPermissionName());
-		    		authorities.add(auth);
-		    	}
-			}
+            user = userService.getByUserName(userName);
 
-		
-		} catch (ServiceException e) {
-			LOGGER.error("Exception while querrying customer",e);
-			throw new SecurityDataAccessException("Cannot authenticate customer",e);
-		}
+            if (user == null) {
+                //return null;
+                throw new UsernameNotFoundException("User " + userName + " not found");
+            }
 
-		return userDetails(userName, user, authorities);
-	}
+            GrantedAuthority role = new SimpleGrantedAuthority(ROLE_PREFIX + Constants.PERMISSION_AUTHENTICATED);//required to login
+            authorities.add(role);
+
+            List<Integer> groupsId = new ArrayList<Integer>();
+            List<Group> groups = user.getGroups();
+            for (Group group : groups) {
+                groupsId.add(group.getId());
+            }
+
+
+            if (CollectionUtils.isNotEmpty(groupsId)) {
+                List<Permission> permissions = permissionService.getPermissions(groupsId);
+                for (Permission permission : permissions) {
+                    GrantedAuthority auth = new SimpleGrantedAuthority(permission.getPermissionName());
+                    authorities.add(auth);
+                }
+            }
+
+
+        } catch (ServiceException e) {
+            LOGGER.error("Exception while querrying customer", e);
+            throw new SecurityDataAccessException("Cannot authenticate customer", e);
+        }
+
+        return userDetails(userName, user, authorities);
+    }
 
 }

@@ -1,10 +1,10 @@
 package com.salesmanager.shop.model.shop;
 
+import com.salesmanager.core.model.reference.language.Language;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.salesmanager.core.model.reference.language.Language;
 
 
 public class Breadcrumb implements Serializable {

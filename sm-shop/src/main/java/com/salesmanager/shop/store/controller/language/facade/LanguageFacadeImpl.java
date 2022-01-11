@@ -5,27 +5,28 @@ import com.salesmanager.core.business.services.reference.language.LanguageServic
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.store.api.exception.ResourceNotFoundException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
-import java.util.List;
-import javax.inject.Inject;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.List;
 
 @Service
 public class LanguageFacadeImpl implements LanguageFacade {
 
-  @Inject
-  private LanguageService languageService;
+    @Inject
+    private LanguageService languageService;
 
-  @Override
-  public List<Language> getLanguages() {
-    try{
-      List<Language> languages = languageService.getLanguages();
-      if (languages.isEmpty()) {
-        throw new ResourceNotFoundException("No languages found");
-      }
-      return languages;
-    } catch (ServiceException e){
-      throw new ServiceRuntimeException(e);
+    @Override
+    public List<Language> getLanguages() {
+        try {
+            List<Language> languages = languageService.getLanguages();
+            if (languages.isEmpty()) {
+                throw new ResourceNotFoundException("No languages found");
+            }
+            return languages;
+        } catch (ServiceException e) {
+            throw new ServiceRuntimeException(e);
+        }
+
     }
-
-  }
 }

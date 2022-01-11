@@ -1,5 +1,6 @@
 package com.salesmanager.shop.constants;
 
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 public class Constants {
 	
 	public final static String DEFAULT_TEMPLATE = "december";
@@ -26,9 +27,6 @@ public class Constants {
 	public final static String REF_SPLITTER = ":";
 	
 	public final static String FILE_NOT_FOUND = "File not found";
-	
-
-
 	public final static String DEFAULT_DOMAIN_NAME = "localhost:8080";
 
 	public final static String ADMIN_STORE = "ADMIN_STORE";

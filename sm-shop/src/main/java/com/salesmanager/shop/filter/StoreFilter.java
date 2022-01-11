@@ -52,7 +52,12 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -60,6 +65,7 @@ import java.util.stream.Collectors;
  * Servlet Filter implementation class StoreFilter
  */
 
+@SuppressWarnings({"deprecation", "GrazieInspection", "DuplicatedCode"})
 public class StoreFilter extends HandlerInterceptorAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StoreFilter.class);
@@ -115,39 +121,19 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 	}
 
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
-
+	@SuppressWarnings("NullableProblems")
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		request.setCharacterEncoding("UTF-8");
-
-		/**
-		 * if url contains /services exit from here !
-		 */
 		if (request.getRequestURL().toString().toLowerCase().contains(SERVICES_URL_PATTERN)
 				|| request.getRequestURL().toString().toLowerCase().contains(REFERENCE_URL_PATTERN)) {
 			return true;
 		}
-
-		/*****
-		 * where is my stuff
-		 */
-		// String currentPath = System.getProperty("user.dir");
-		// System.out.println("*** user.dir ***" + currentPath);
-		// LOGGER.debug("*** user.dir ***" + currentPath);
-
-		try
-
-		{
-
-			/** merchant store **/
+		try {
 			MerchantStore store = (MerchantStore) request.getSession().getAttribute(Constants.MERCHANT_STORE);
-
 			String storeCode = request.getParameter(STORE_REQUEST_PARAMETER);
-
 			// remove link set from controllers for declaring active - inactive
 			// links
 			request.removeAttribute(Constants.LINK_CODE);
-
 			if (!StringUtils.isBlank(storeCode)) {
 				if (store != null) {
 					if (!store.getCode().equals(storeCode)) {
@@ -158,41 +144,16 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 					store = setMerchantStoreInSession(request, storeCode);
 				}
 			}
-
 			if (store == null) {
 				store = setMerchantStoreInSession(request, MerchantStore.DEFAULT_STORE);
 			}
-			
 			if(StringUtils.isBlank(store.getStoreTemplate())) {
 				store.setStoreTemplate(Constants.DEFAULT_TEMPLATE);
 			}
 			request.setAttribute(Constants.MERCHANT_STORE, store);
-			
-			
-			/*
-			//remote ip address
-			String remoteAddress = "";
-			try {
-				
-				if (request != null) {
-					remoteAddress = request.getHeader("X-Forwarded-For");
-					if (remoteAddress == null || "".equals(remoteAddress)) {
-						remoteAddress = request.getRemoteAddr();
-					}
-				}
-				remoteAddress = remoteAddress != null && remoteAddress.contains(",") ? remoteAddress.split(",")[0] : remoteAddress;
-				LOGGER.info("remote ip addres {}", remoteAddress);
-			} catch (Exception e) {
-				LOGGER.error("Error while getting user remote address");
-			}
-			*/
-			
 			String ipAddress = GeoLocationUtils.getClientIpAddress(request);
-			
 			UserContext userContext = UserContext.create();
 			userContext.setIpAddress(ipAddress);
-
-			/** customer **/
 			Customer customer = (Customer) request.getSession().getAttribute(Constants.CUSTOMER);
 			if (customer != null) {
 				if (customer.getMerchantStore().getId().intValue() != store.getId().intValue()) {
@@ -203,14 +164,9 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 						request.removeAttribute(Constants.CUSTOMER);
 					}
 				}
-				
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				
 				request.setAttribute(Constants.CUSTOMER, customer);
 			}
-
 			if (customer == null) {
-
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				if (auth != null && request.isUserInRole("AUTH_CUSTOMER")) {
 					customer = customerService.getByNick(auth.getName());
@@ -219,23 +175,18 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 					}
 				}
 			}
-
 			AnonymousCustomer anonymousCustomer = (AnonymousCustomer) request.getSession()
 					.getAttribute(Constants.ANONYMOUS_CUSTOMER);
 			if (anonymousCustomer == null) {
-
 				Address address = null;
 				try {
-
 					if(!StringUtils.isBlank(ipAddress)) {
-						com.salesmanager.core.model.common.Address geoAddress = customerService.getCustomerAddress(store,
-								ipAddress);
+						com.salesmanager.core.model.common.Address geoAddress = customerService.getCustomerAddress(store, ipAddress);
 						if (geoAddress != null) {
 							address = new Address();
 							address.setCountry(geoAddress.getCountry());
 							address.setCity(geoAddress.getCity());
 							address.setZone(geoAddress.getZone());
-							/** no postal code **/
 							// address.setPostalCode(geoAddress.getPostalCode());
 						}
 					}
@@ -251,7 +202,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 					} else {
 						address.setStateProvince(store.getStorestateprovince());
 					}
-					/** no postal code **/
 					// address.setPostalCode(store.getStorepostalcode());
 				}
 
@@ -262,57 +212,21 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 				request.setAttribute(Constants.ANONYMOUS_CUSTOMER, anonymousCustomer);
 			}
 
-			/** language & locale **/
 			Language language = languageUtils.getRequestLanguage(request, response);
 			request.setAttribute(Constants.LANGUAGE, language);
 
 			Locale locale = languageService.toLocale(language, store);
 			request.setAttribute(Constants.LOCALE, locale);
-
 			// Locale locale = LocaleContextHolder.getLocale();
 			LocaleContextHolder.setLocale(locale);
-
-			/** Breadcrumbs **/
 			setBreadcrumb(request, locale);
-
-			/**
-			 * Get global objects Themes are built on a similar way displaying
-			 * Header, Body and Footer Header and Footer are displayed on each
-			 * page Some themes also contain side bars which may include similar
-			 * emements
-			 * 
-			 * Elements from Header : - CMS links - Customer - Mini shopping
-			 * cart - Store name / logo - Top categories - Search
-			 * 
-			 * Elements from Footer : - CMS links - Store address - Global
-			 * payment information - Global shipping information
-			 */
-
 			// get from the cache first
-			/**
-			 * The cache for each object contains 2 objects, a Cache and a
-			 * Missed-Cache Get objects from the cache If not null use those
-			 * objects If null, get entry from missed-cache If missed-cache not
-			 * null then nothing exist If missed-cache null, add missed-cache
-			 * entry and load from the database If objects from database not
-			 * null store in cache
-			 */
-
-			/******* CMS Objects ********/
 			this.getContentObjects(store, language, request);
 
-			/******* CMS Page names **********/
 			this.getContentPageNames(store, language, request);
 
-			/******* Top Categories ********/
 			// this.getTopCategories(store, language, request);
 			this.setTopCategories(store, language, request);
-
-			/******* Default metatags *******/
-
-			/**
-			 * Title Description Keywords
-			 */
 
 			PageInformation pageInformation = new PageInformation();
 			pageInformation.setPageTitle(store.getStorename());
@@ -328,7 +242,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 				// List<ContentDescription> contentsList = contents.get(key);
 				// for(Content content : contentsList) {
 				// if(key.equals(Constants.CONTENT_LANDING_PAGE)) {
-
 				// List<ContentDescription> descriptions =
 				// content.getDescriptions();
 				ContentDescription contentDescription = contents.get(Constants.CONTENT_LANDING_PAGE);
@@ -349,17 +262,7 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 			request.setAttribute(Constants.REQUEST_PAGE_INFORMATION, pageInformation);
 
-			/******* Configuration objects *******/
-
-			/**
-			 * SHOP configuration type Should contain - Different configuration
-			 * flags - Google analytics - Facebook page - Twitter handle - Show
-			 * customer login - ...
-			 */
-
 			this.getMerchantConfigurations(store, request);
-
-			/******* Shopping Cart *********/
 
 			String shoppingCarCode = (String) request.getSession().getAttribute(Constants.SHOPPING_CART);
 			if (shoppingCarCode != null) {
@@ -376,19 +279,16 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 	@SuppressWarnings("unchecked")
 	private void getMerchantConfigurations(MerchantStore store, HttpServletRequest request) throws Exception {
-
-		StringBuilder configKey = new StringBuilder();
-		configKey.append(store.getId()).append("_").append(Constants.CONFIG_CACHE_KEY);
+		// Convert configKey StringBuilder into String
+		String configKey = store.getId() + "_" + Constants.CONFIG_CACHE_KEY;
 
 		StringBuilder configKeyMissed = new StringBuilder();
-		configKeyMissed.append(configKey.toString()).append(Constants.MISSED_CACHE_KEY);
-
-		Map<String, Object> configs = null;
+		configKeyMissed.append(configKey).append(Constants.MISSED_CACHE_KEY);
+		Map<String, Object> configs;
 
 		if (store.isUseCache()) {
-
 			// get from the cache
-			configs = (Map<String, Object>) cache.getFromCache(configKey.toString());
+			configs = (Map<String, Object>) cache.getFromCache(configKey);
 			if (configs == null) {
 				// get from missed cache
 				// Boolean missedContent =
@@ -399,11 +299,10 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 				// put in cache
 
 				if (configs != null) {
-					cache.putInCache(configs, configKey.toString());
+					cache.putInCache(configs, configKey);
 				} else {
 					// put in missed cache
-					// cache.putInCache(new Boolean(true),
-					// configKeyMissed.toString());
+					// May need to update this part..
 				}
 				// }
 			}
@@ -422,24 +321,15 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	private void getContentPageNames(MerchantStore store, Language language, HttpServletRequest request)
 			throws Exception {
 
-		/**
-		 * CMS links Those links are implemented as pages (Content)
-		 * ContentDescription will provide attributes name for the label to be
-		 * displayed and seUrl for the friendly url page
-		 */
-
 		// build the key
-		/**
-		 * The cache is kept as a Map<String,Object> The key is
-		 * <MERCHANT_ID>_CONTENTPAGELOCALE The value is a List of Content object
-		 */
 
 		StringBuilder contentKey = new StringBuilder();
 		contentKey.append(store.getId()).append("_").append(Constants.CONTENT_PAGE_CACHE_KEY).append("-")
 				.append(language.getCode());
 
+		// This SB is unused...
 		StringBuilder contentKeyMissed = new StringBuilder();
-		contentKeyMissed.append(contentKey.toString()).append(Constants.MISSED_CACHE_KEY);
+		contentKeyMissed.append(contentKey).append(Constants.MISSED_CACHE_KEY);
 
 		Map<String, List<ContentDescription>> contents = null;
 
@@ -463,8 +353,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 				} else {
 					// put in missed cache
-					// cache.putInCache(new Boolean(true),
-					// contentKeyMissed.toString());
 				}
 				// }
 			}
@@ -485,24 +373,14 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	private void getContentObjects(MerchantStore store, Language language, HttpServletRequest request)
 			throws Exception {
 
-		/**
-		 * CMS links Those links are implemented as pages (Content)
-		 * ContentDescription will provide attributes name for the label to be
-		 * displayed and seUrl for the friendly url page
-		 */
-
 		// build the key
-		/**
-		 * The cache is kept as a Map<String,Object> The key is
-		 * CONTENT_<MERCHANT_ID>_<LOCALE> The value is a List of Content object
-		 */
 
 		StringBuilder contentKey = new StringBuilder();
 		contentKey.append(store.getId()).append("_").append(Constants.CONTENT_CACHE_KEY).append("-")
 				.append(language.getCode());
 
 		StringBuilder contentKeyMissed = new StringBuilder();
-		contentKeyMissed.append(contentKey.toString()).append(Constants.MISSED_CACHE_KEY);
+		contentKeyMissed.append(contentKey).append(Constants.MISSED_CACHE_KEY);
 
 		Map<String, List<Content>> contents = null;
 
@@ -525,8 +403,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 					cache.putInCache(contents, contentKey.toString());
 				} else {
 					// put in missed cache
-					// cache.putInCache(new Boolean(true),
-					// contentKeyMissed.toString());
 				}
 				// }
 
@@ -539,12 +415,9 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 		if (contents != null && contents.size() > 0) {
 
-			// request.setAttribute(Constants.REQUEST_CONTENT_OBJECTS,
-			// contents);
-
 			List<Content> contentByStore = contents.get(contentKey.toString());
 			if (!CollectionUtils.isEmpty(contentByStore)) {
-				Map<String, ContentDescription> contentMap = new HashMap<String, ContentDescription>();
+				Map<String, ContentDescription> contentMap = new HashMap<>();
 				for (Content content : contentByStore) {
 					if (content.isVisible()) {
 						contentMap.put(content.getCode(), content.getDescription());
@@ -564,8 +437,9 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 		categoriesKey.append(store.getId()).append("_").append(Constants.CATEGORIES_CACHE_KEY).append("-")
 				.append(language.getCode());
 
+		// This one is also unused.. (never queried)
 		StringBuilder categoriesKeyMissed = new StringBuilder();
-		categoriesKeyMissed.append(categoriesKey.toString()).append(Constants.MISSED_CACHE_KEY);
+		categoriesKeyMissed.append(categoriesKey).append(Constants.MISSED_CACHE_KEY);
 
 		// language code - List of category
 		Map<String, List<ReadableCategory>> objects = null;
@@ -583,7 +457,7 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 				// filter out invisible category
 				loadedCategories.stream().filter(cat -> cat.isVisible() == true).collect(Collectors.toList());
 
-				objects = new ConcurrentHashMap<String, List<ReadableCategory>>();
+				objects = new ConcurrentHashMap<>();
 				objects.put(language.getCode(), loadedCategories);
 				webApplicationCache.putInCache(categoriesKey.toString(), objects);
 
@@ -607,10 +481,10 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	private Map<String, List<ContentDescription>> getContentPagesNames(MerchantStore store, Language language)
 			throws Exception {
 
-		Map<String, List<ContentDescription>> contents = new ConcurrentHashMap<String, List<ContentDescription>>();
+		Map<String, List<ContentDescription>> contents = new ConcurrentHashMap<>();
 
 		// Get boxes and sections from the database
-		List<ContentType> contentTypes = new ArrayList<ContentType>();
+		List<ContentType> contentTypes = new ArrayList<>();
 		contentTypes.add(ContentType.PAGE);
 
 		List<ContentDescription> contentPages = contentService.listNameByType(contentTypes, store, language);
@@ -620,15 +494,14 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 			// create a Map<String,List<Content>
 			for (ContentDescription content : contentPages) {
 
-				Language lang = language;
 				String key = new StringBuilder().append(store.getId()).append("_")
-						.append(Constants.CONTENT_PAGE_CACHE_KEY).append("-").append(lang.getCode()).toString();
-				List<ContentDescription> contentList = null;
+						.append(Constants.CONTENT_PAGE_CACHE_KEY).append("-").append(language.getCode()).toString();
+				List<ContentDescription> contentList;
 				if (contents == null || contents.size() == 0) {
-					contents = new HashMap<String, List<ContentDescription>>();
+					contents = new HashMap<>();
 				}
 				if (!contents.containsKey(key)) {
-					contentList = new ArrayList<ContentDescription>();
+					contentList = new ArrayList<>();
 
 					contents.put(key, contentList);
 				} else {// get from key
@@ -646,10 +519,10 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 	private Map<String, List<Content>> getContent(MerchantStore store, Language language) throws Exception {
 
-		Map<String, List<Content>> contents = new ConcurrentHashMap<String, List<Content>>();
+		Map<String, List<Content>> contents = new ConcurrentHashMap<>();
 
 		// Get boxes and sections from the database
-		List<ContentType> contentTypes = new ArrayList<ContentType>();
+		List<ContentType> contentTypes = new ArrayList<>();
 		contentTypes.add(ContentType.BOX);
 		contentTypes.add(ContentType.SECTION);
 
@@ -666,11 +539,11 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 						String key = new StringBuilder().append(store.getId()).append("_")
 								.append(Constants.CONTENT_CACHE_KEY).append("-").append(lang.getCode()).toString();
 						List<Content> contentList = null;
-						if (contents == null || contents.size() == 0) {
-							contents = new HashMap<String, List<Content>>();
+						if (contents.size() == 0) {
+							contents = new HashMap<>();
 						}
 						if (!contents.containsKey(key)) {
-							contentList = new ArrayList<Content>();
+							contentList = new ArrayList<>();
 
 							contents.put(key, contentList);
 						} else {// get from key
@@ -699,21 +572,10 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	// Language language)
 	// throws Exception {
 	private Map<String, List<ReadableCategory>> getCategories(MerchantStore store, Language language) throws Exception {
-
-		// Map<String, List<Category>> objects = new ConcurrentHashMap<String,
-		// List<Category>>();
-		Map<String, List<ReadableCategory>> objects = new ConcurrentHashMap<String, List<ReadableCategory>>();
-
-		/**
-		 * returns categories with required depth, 0 = root category, 1 = root +
-		 * 1 layer child ...)
-		 **/
+		Map<String, List<ReadableCategory>> objects = new ConcurrentHashMap<>();
 		List<Category> categories = categoryService.getListByDepth(store, 0, language);
-
 		ReadableCategoryPopulator readableCategoryPopulator = new ReadableCategoryPopulator();
-
-		Map<String, ReadableCategory> subs = new ConcurrentHashMap<String, ReadableCategory>();
-
+		Map<String, ReadableCategory> subs = new ConcurrentHashMap<>();
 		if (categories != null && categories.size() > 0) {
 
 			// create a Map<String,List<Content>
@@ -741,17 +603,15 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 							// List<Category> cacheCategories = null;
 							List<ReadableCategory> cacheCategories = null;
 							if (objects == null || objects.size() == 0) {
-								// objects = new HashMap<String,
-								// List<Category>>();
-								objects = new HashMap<String, List<ReadableCategory>>();
+								objects = new HashMap<>();
 							}
 							if (!objects.containsKey(key)) {
 								// cacheCategories = new ArrayList<Category>();
-								cacheCategories = new ArrayList<ReadableCategory>();
+								cacheCategories = new ArrayList<>();
 
 								objects.put(key, cacheCategories);
 							} else {
-								cacheCategories = objects.get(key.toString());
+								cacheCategories = objects.get(key);
 								if (cacheCategories == null) {
 									LOGGER.error("Cannot find categories key in cache " + key);
 									continue;
@@ -774,7 +634,7 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	@SuppressWarnings("unused")
 	private Map<String, Object> getConfigurations(MerchantStore store) {
 
-		Map<String, Object> configs = new HashMap<String, Object>();
+		Map<String, Object> configs = new HashMap<>();
 		try {
 
 			List<MerchantConfiguration> merchantConfiguration = merchantConfigurationService
@@ -786,7 +646,7 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 
 			if (!CollectionUtils.isEmpty(socialConfigs)) {
 				if (CollectionUtils.isEmpty(merchantConfiguration)) {
-					merchantConfiguration = new ArrayList<MerchantConfiguration>();
+					merchantConfiguration = new ArrayList<>();
 				}
 				merchantConfiguration.addAll(socialConfigs);
 			}
@@ -806,7 +666,7 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 			MerchantConfig merchantConfig = merchantConfigurationService.getMerchantConfig(store);
 			if (merchantConfig != null) {
 				if (configs == null) {
-					configs = new HashMap<String, Object>();
+					configs = new HashMap<>();
 				}
 
 				ObjectMapper m = new ObjectMapper();
@@ -843,9 +703,9 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 				if (language.getCode().equals(breadCrumb.getLanguage().getCode())) {
 
 					// rebuild using the appropriate language
-					List<BreadcrumbItem> items = new ArrayList<BreadcrumbItem>();
+					List<BreadcrumbItem> items = new ArrayList<>();
 					for (BreadcrumbItem item : breadCrumb.getBreadCrumbs()) {
-
+						// String#equals to a BreadcrumbItemType?
 						if (item.getItemType().name().equals(BreadcrumbItemType.HOME)) {
 							BreadcrumbItem homeItem = this.getDefaultBreadcrumbItem(language, locale);
 							homeItem.setItemType(BreadcrumbItemType.HOME);
@@ -883,7 +743,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 								items.add(contentItem);
 							}
 						}
-
 					}
 
 					breadCrumb = new Breadcrumb();
@@ -904,14 +763,12 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 	}
 
 	private BreadcrumbItem getDefaultBreadcrumbItem(Language language, Locale locale) {
-
 		// set home page item
 		BreadcrumbItem item = new BreadcrumbItem();
 		item.setItemType(BreadcrumbItemType.HOME);
 		item.setLabel(messages.getMessage(Constants.HOME_MENU_KEY, locale));
 		item.setUrl(Constants.HOME_URL);
 		return item;
-
 	}
 
 	/**
@@ -946,8 +803,6 @@ public class StoreFilter extends HandlerInterceptorAdapter {
 		if(userContext!=null) {
 			userContext.close();
 		}
-
-		
 	}
 
 }

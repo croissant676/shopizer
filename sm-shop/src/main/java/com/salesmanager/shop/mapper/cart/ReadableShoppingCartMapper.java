@@ -44,6 +44,7 @@ import com.salesmanager.shop.model.shoppingcart.ReadableShoppingCartItem;
 import com.salesmanager.shop.store.api.exception.ConversionRuntimeException;
 import com.salesmanager.shop.utils.ImageFilePath;
 
+@SuppressWarnings("ALL")
 @Component
 public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, ReadableShoppingCart> {
 
@@ -85,68 +86,40 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 		destination.setCustomer(source.getCustomerId());
 
 		try {
-
-			if (!StringUtils.isBlank(source.getPromoCode())) {
-				Date promoDateAdded = source.getPromoAdded();// promo valid 1 day
-				if (promoDateAdded == null) {
-					promoDateAdded = new Date();
-				}
-				Instant instant = promoDateAdded.toInstant();
-				ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-				LocalDate date = zdt.toLocalDate();
-				// date added < date + 1 day
-				LocalDate tomorrow = LocalDate.now().plusDays(1);
-				if (date.isBefore(tomorrow)) {
-					destination.setPromoCode(source.getPromoCode());
-				}
-			}
-
+			checkPromoCode(source, destination);
 			Set<com.salesmanager.core.model.shoppingcart.ShoppingCartItem> items = source.getLineItems();
-
 			if (items != null) {
-
 				for (com.salesmanager.core.model.shoppingcart.ShoppingCartItem item : items) {
 
 					ReadableShoppingCartItem shoppingCartItem = new ReadableShoppingCartItem();
 
 					readableMinimalProductMapper.merge(item.getProduct(), shoppingCartItem, store, language);
-
 					// ReadableProductPopulator readableProductPopulator = new
 					// ReadableProductPopulator();
 					// readableProductPopulator.setPricingService(pricingService);
 					// readableProductPopulator.setimageUtils(imageUtils);
 					// readableProductPopulator.populate(item.getProduct(), shoppingCartItem, store,
 					// language);
-
 					shoppingCartItem.setPrice(item.getItemPrice());
 					shoppingCartItem.setFinalPrice(pricingService.getDisplayAmount(item.getItemPrice(), store));
-
 					shoppingCartItem.setQuantity(item.getQuantity());
-
 					cartQuantity = cartQuantity + item.getQuantity();
-
 					BigDecimal subTotal = pricingService.calculatePriceQuantity(item.getItemPrice(),
 							item.getQuantity());
-
 					// calculate sub total (price * quantity)
 					shoppingCartItem.setSubTotal(subTotal);
-
 					shoppingCartItem.setDisplaySubTotal(pricingService.getDisplayAmount(subTotal, store));
-
 					Set<com.salesmanager.core.model.shoppingcart.ShoppingCartAttributeItem> attributes = item
 							.getAttributes();
 					if (attributes != null) {
 						for (com.salesmanager.core.model.shoppingcart.ShoppingCartAttributeItem attribute : attributes) {
-
 							ProductAttribute productAttribute = productAttributeService
 									.getById(attribute.getProductAttributeId());
-
 							if (productAttribute == null) {
 								LOG.warn("Product attribute with ID " + attribute.getId()
 										+ " not found, skipping cart attribute " + attribute.getId());
 								continue;
 							}
-
 							ReadableShoppingCartAttribute cartAttribute = new ReadableShoppingCartAttribute();
 
 							cartAttribute.setId(attribute.getId());
@@ -257,6 +230,23 @@ public class ReadableShoppingCartMapper implements Mapper<ShoppingCart, Readable
 		}
 
 		return destination;
+	}
+
+	public static void checkPromoCode(ShoppingCart source, ReadableShoppingCart destination) {
+		if (!StringUtils.isBlank(source.getPromoCode())) {
+			Date promoDateAdded = source.getPromoAdded();// promo valid 1 day
+			if (promoDateAdded == null) {
+				promoDateAdded = new Date();
+			}
+			Instant instant = promoDateAdded.toInstant();
+			ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+			LocalDate date = zdt.toLocalDate();
+			// date added < date + 1 day
+			LocalDate tomorrow = LocalDate.now().plusDays(1);
+			if (date.isBefore(tomorrow)) {
+				destination.setPromoCode(source.getPromoCode());
+			}
+		}
 	}
 
 }

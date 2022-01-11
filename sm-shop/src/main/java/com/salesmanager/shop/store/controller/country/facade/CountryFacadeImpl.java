@@ -10,10 +10,11 @@ import com.salesmanager.shop.model.references.ReadableCountry;
 import com.salesmanager.shop.populator.references.ReadableCountryPopulator;
 import com.salesmanager.shop.store.api.exception.ConversionRuntimeException;
 import com.salesmanager.shop.store.api.exception.ServiceRuntimeException;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CountryFacadeImpl implements CountryFacade {

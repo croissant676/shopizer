@@ -1,70 +1,70 @@
 package com.salesmanager.shop.store.security.user;
 
-import java.util.Collection;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import java.util.Collection;
+
 public class CustomerDetails extends User {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private String email;
-	private Long id;
-	private String firstName;
-	private String lastName;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	public CustomerDetails(
-			String username, 
-			String password, 
-			boolean enabled, 
-			boolean accountNonExpired,
-			boolean credentialsNonExpired, 
-			boolean accountNonLocked,
-			Collection<? extends GrantedAuthority> authorities) {
-		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-	}
-	
-	public CustomerDetails(
-			String username, 
-			String password, 
-			Collection<? extends GrantedAuthority> authorities) {
-		super(username, password, true, true, true, true, authorities);
-	}
+    private String email;
+    private Long id;
+    private String firstName;
+    private String lastName;
 
-	public String getEmail() {
-		return email;
-	}
+    public CustomerDetails(
+            String username,
+            String password,
+            boolean enabled,
+            boolean accountNonExpired,
+            boolean credentialsNonExpired,
+            boolean accountNonLocked,
+            Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public CustomerDetails(
+            String username,
+            String password,
+            Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, true, true, true, true, authorities);
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
 }

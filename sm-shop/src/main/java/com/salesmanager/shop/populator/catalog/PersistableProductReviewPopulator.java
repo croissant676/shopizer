@@ -1,11 +1,5 @@
 package com.salesmanager.shop.populator.catalog;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.product.ProductService;
 import com.salesmanager.core.business.services.customer.CustomerService;
@@ -19,6 +13,11 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.PersistableProductReview;
 import com.salesmanager.shop.utils.DateUtil;
+import org.apache.commons.lang3.Validate;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 

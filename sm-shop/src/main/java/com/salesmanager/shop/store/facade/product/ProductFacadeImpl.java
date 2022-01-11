@@ -1,21 +1,5 @@
 package com.salesmanager.shop.store.facade.product;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.category.CategoryService;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
@@ -38,7 +22,6 @@ import com.salesmanager.core.model.catalog.product.relationship.ProductRelations
 import com.salesmanager.core.model.catalog.product.review.ProductReview;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
-import com.salesmanager.shop.constants.Constants;
 import com.salesmanager.shop.model.catalog.product.LightPersistableProduct;
 import com.salesmanager.shop.model.catalog.product.PersistableProduct;
 import com.salesmanager.shop.model.catalog.product.PersistableProductReview;
@@ -61,6 +44,20 @@ import com.salesmanager.shop.store.controller.product.facade.ProductFacade;
 import com.salesmanager.shop.utils.DateUtil;
 import com.salesmanager.shop.utils.ImageFilePath;
 import com.salesmanager.shop.utils.LocaleUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("productFacade")
 @Profile({ "default", "cloud", "gcp", "aws", "mysql" })
@@ -177,7 +174,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProduct readableProduct = new ReadableProduct();
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		readableProduct = populator.populate(product, readableProduct, store, language);
 
 		return readableProduct;
@@ -197,7 +194,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(product, readableProduct, store, language);
 
 		return readableProduct;
@@ -238,7 +235,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(persistable, readableProduct, persistable.getMerchantStore(), language);
 
 		return readableProduct;
@@ -265,7 +262,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(persistable, readableProduct, persistable.getMerchantStore(), language);
 
 		return readableProduct;
@@ -322,7 +319,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 
 		ReadableProductList productList = new ReadableProductList();
 		for (Product product : products) {
@@ -367,7 +364,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
 		return readableProduct;
@@ -389,7 +386,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
 		return readableProduct;
@@ -406,7 +403,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(product, readableProduct, product.getMerchantStore(), language);
 
 		return readableProduct;
@@ -463,7 +460,7 @@ public class ProductFacadeImpl implements ProductFacade {
 			throws Exception {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 
 		List<ProductRelationship> relatedItems = productRelationshipService.getByType(store, product,
 				ProductRelationshipType.RELATED_ITEM);
@@ -566,7 +563,7 @@ public class ProductFacadeImpl implements ProductFacade {
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 
 		populator.setPricingService(pricingService);
-		populator.setimageUtils(imageUtils);
+		populator.setImageUtils(imageUtils);
 		populator.populate(product, readableProduct, store, language);
 
 		return readableProduct;

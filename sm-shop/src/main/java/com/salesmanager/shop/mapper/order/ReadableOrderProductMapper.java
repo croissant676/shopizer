@@ -106,7 +106,7 @@ public class ReadableOrderProductMapper implements Mapper<OrderProduct, Readable
 				// TODO autowired
 				ReadableProductPopulator populator = new ReadableProductPopulator();
 				populator.setPricingService(pricingService);
-				populator.setimageUtils(imageUtils);
+				populator.setImageUtils(imageUtils);
 
 				ReadableProduct productProxy;
 				try {

@@ -1,7 +1,5 @@
 package com.salesmanager.shop.populator.catalog;
 
-import java.util.Set;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
 import com.salesmanager.core.model.catalog.product.review.ProductReview;
@@ -12,6 +10,8 @@ import com.salesmanager.shop.model.catalog.product.ReadableProductReview;
 import com.salesmanager.shop.model.customer.ReadableCustomer;
 import com.salesmanager.shop.populator.customer.ReadableCustomerPopulator;
 import com.salesmanager.shop.utils.DateUtil;
+
+import java.util.Set;
 
 public class ReadableProductReviewPopulator extends
 		AbstractDataPopulator<ProductReview, ReadableProductReview> {

@@ -1,10 +1,5 @@
 package com.salesmanager.shop.populator.order.transaction;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.product.PricingService;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
@@ -14,6 +9,10 @@ import com.salesmanager.core.model.payments.PaymentType;
 import com.salesmanager.core.model.payments.TransactionType;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.order.transaction.PersistablePayment;
+import org.apache.commons.lang3.Validate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersistablePaymentPopulator extends AbstractDataPopulator<PersistablePayment, Payment> {
 	

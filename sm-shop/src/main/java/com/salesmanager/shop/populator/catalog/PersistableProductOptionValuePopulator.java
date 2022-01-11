@@ -1,11 +1,5 @@
 package com.salesmanager.shop.populator.catalog;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.reference.language.LanguageService;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
@@ -14,6 +8,11 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.attribute.PersistableProductOptionValue;
 import com.salesmanager.shop.model.catalog.product.attribute.ProductOptionValueDescription;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 
@@ -43,11 +42,7 @@ public class PersistableProductOptionValuePopulator extends
 			throws ConversionException {
 		
 		Validate.notNull(languageService, "Requires to set LanguageService");
-		
-		
 		try {
-			
-
 			target.setMerchantStore(store);
 			target.setProductOptionValueSortOrder(source.getOrder());
 			target.setCode(source.getCode());

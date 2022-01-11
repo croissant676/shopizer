@@ -1,18 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.catalog.category.CategoryService;
@@ -35,6 +22,17 @@ import com.salesmanager.shop.model.catalog.product.ProductPriceEntity;
 import com.salesmanager.shop.model.catalog.product.product.definition.PersistableProductDefinition;
 import com.salesmanager.shop.store.api.exception.ConversionRuntimeException;
 import com.salesmanager.shop.utils.DateUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class PersistableProductDefinitionMapper implements Mapper<PersistableProductDefinition, Product> {
@@ -73,7 +71,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 			destination.setDateAvailable(new Date());
 
 			destination.setRefSku(source.getIdentifier());
-			if(source.getId() != null && source.getId().longValue()==0) {
+			if(source.getId() != null && source.getId() ==0) {
 				destination.setId(null);
 			} else {
 				destination.setId(source.getId());
@@ -200,7 +198,7 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 			    defaultPrice.setProductAvailability(productAvailability);
                 productAvailability.getPrices().add(defaultPrice);
                 for(Language lang : languages) {
-                
+
                   ProductPriceDescription ppd = new ProductPriceDescription();
                   ppd.setProductPrice(defaultPrice);
                   ppd.setLanguage(lang);
@@ -253,28 +251,8 @@ public class PersistableProductDefinitionMapper implements Mapper<PersistablePro
 
 			
 			//categories
-			if(!CollectionUtils.isEmpty(source.getCategories())) {
-				for(com.salesmanager.shop.model.catalog.category.Category categ : source.getCategories()) {
-					
-					Category c = null;
-					if(!StringUtils.isBlank(categ.getCode())) {
-						c = categoryService.getByCode(store, categ.getCode());
-					} else {
-						Validate.notNull(categ.getId(), "Category id nust not be null");
-						c = categoryService.getById(categ.getId(), store.getId());
-					}
-					
-					if(c==null) {
-						throw new ConversionException("Category id " + categ.getId() + " does not exist");
-					}
-					if(c.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-						throw new ConversionException("Invalid category id");
-					}
-					destination.getCategories().add(c);
-				}
-			}
-			return destination;
-		
+			return getProduct(destination, store, source.getCategories(), categoryService, source);
+
 		} catch (Exception e) {
 			throw new ConversionRuntimeException("Error converting product mapper",e);
 		}

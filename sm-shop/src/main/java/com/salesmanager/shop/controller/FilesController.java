@@ -19,13 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@SuppressWarnings("JavaDoc")
 @Controller
 public class FilesController extends AbstractController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FilesController.class);
-	
 
-	
 	@Inject
 	private ContentService contentService;
 	
@@ -70,15 +69,10 @@ public class FilesController extends AbstractController {
 	@PreAuthorize("hasRole('PRODUCTS')")
 	@RequestMapping("/admin/files/downloads/{storeCode}/{fileName}.{extension}")
 	public @ResponseBody byte[] downloadProduct(@PathVariable final String storeCode, @PathVariable final String fileName, @PathVariable final String extension, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
 		FileContentType fileType = FileContentType.PRODUCT_DIGITAL;
-		
-		String fileNameAndExtension = new StringBuilder().append(fileName).append(".").append(extension).toString();
-		
+		String fileNameAndExtension = fileName + "." + extension;
 		// needs to query the new API
 		OutputContentFile file = contentService.getContentFile(storeCode, fileType, fileNameAndExtension);
-		
-		
 		if(file!=null) {
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileNameAndExtension + "\"");
 			return file.getFile().toByteArray();

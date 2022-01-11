@@ -1,11 +1,5 @@
 package com.salesmanager.shop.populator.catalog;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.Validate;
-
 import com.salesmanager.core.business.exception.ConversionException;
 import com.salesmanager.core.business.services.reference.language.LanguageService;
 import com.salesmanager.core.business.utils.AbstractDataPopulator;
@@ -14,6 +8,11 @@ import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.shop.model.catalog.product.attribute.PersistableProductOption;
 import com.salesmanager.shop.model.catalog.product.attribute.ProductOptionDescription;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 
@@ -46,7 +45,7 @@ public class PersistableProductOptionPopulator extends
 			target.setCode(source.getCode());
 			
 			if(!CollectionUtils.isEmpty(source.getDescriptions())) {
-				Set<com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription> descriptions = new HashSet<com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription>();
+				Set<com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription> descriptions = new HashSet<>();
 				for(ProductOptionDescription desc  : source.getDescriptions()) {
 					com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription description = new com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription();
 					Language lang = languageService.getByCode(desc.getLanguage());

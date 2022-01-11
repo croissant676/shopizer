@@ -10,7 +10,7 @@
 	<version>3.0.0</version>
 
 	<name>shopizer</name>
-	<url>http://ww.shopizer.com</url>
+	<url>https://www.shopizer.com</url>
 
 	<licenses>
 		<license>
@@ -577,7 +577,6 @@
 				</executions>
 			</plugin>
 			<!--OSSRH -->
-			
 			<!-- 			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -607,7 +606,6 @@
 				</executions>
 			</plugin> 
 			-->
-
 		</plugins>
 	</build>
 	

@@ -1,16 +1,5 @@
 package com.salesmanager.shop.mapper.catalog;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.jsoup.helper.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.model.catalog.product.attribute.ProductOption;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionDescription;
 import com.salesmanager.core.model.catalog.product.attribute.ProductOptionSet;
@@ -24,6 +13,16 @@ import com.salesmanager.shop.model.catalog.product.attribute.ReadableProductOpti
 import com.salesmanager.shop.model.catalog.product.attribute.ReadableProductOptionValue;
 import com.salesmanager.shop.model.catalog.product.attribute.optionset.ReadableProductOptionSet;
 import com.salesmanager.shop.model.catalog.product.type.ReadableProductType;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ReadableProductOptionSetMapper implements Mapper<ProductOptionSet, ReadableProductOptionSet> {

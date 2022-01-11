@@ -1,24 +1,8 @@
 package com.salesmanager.shop.populator.catalog;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.core.business.exception.ConversionException;
+import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.category.CategoryService;
 import com.salesmanager.core.business.services.catalog.product.attribute.ProductOptionService;
 import com.salesmanager.core.business.services.catalog.product.attribute.ProductOptionValueService;
@@ -45,8 +29,24 @@ import com.salesmanager.shop.model.catalog.product.PersistableImage;
 import com.salesmanager.shop.model.catalog.product.PersistableProduct;
 import com.salesmanager.shop.model.catalog.product.ProductPriceEntity;
 import com.salesmanager.shop.utils.DateUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
+@SuppressWarnings("unused")
 @Component
 public class PersistableProductPopulator extends
 		AbstractDataPopulator<PersistableProduct, Product> {
@@ -72,15 +72,12 @@ public class PersistableProductPopulator extends
 	private ProductTypeService productTypeService;
 
 
-
-
-
 	@Override
 	public Product populate(PersistableProduct source,
-			Product target, MerchantStore store, Language language)
+							Product target, MerchantStore store, Language language)
 			throws ConversionException {
 
-	    Validate.notNull(target,"Product must not be null");
+		Validate.notNull(target, "Product must not be null");
 
 		try {
 
@@ -88,7 +85,7 @@ public class PersistableProductPopulator extends
 			target.setAvailable(source.isAvailable());
 			target.setPreOrder(source.isPreOrder());
 			target.setRefSku(source.getRefSku());
-			if(source.getId() != null && source.getId().longValue()==0) {
+			if (source.getId() != null && source.getId() == 0) {
 				target.setId(null);
 			} else {
 				target.setId(source.getId());
@@ -106,38 +103,34 @@ public class PersistableProductPopulator extends
 			}
 
 
-
-			if(source.getOwner()!=null && source.getOwner().getId()!=null) {
+			if (source.getOwner() != null && source.getOwner().getId() != null) {
 				com.salesmanager.core.model.customer.Customer owner = customerService.getById(source.getOwner().getId());
 				target.setOwner(owner);
 			}
 
-			if(!StringUtils.isBlank(source.getDateAvailable())) {
+			if (!StringUtils.isBlank(source.getDateAvailable())) {
 				target.setDateAvailable(DateUtil.getDate(source.getDateAvailable()));
 			}
-
-
-
 			target.setMerchantStore(store);
 
-			List<Language> languages = new ArrayList<Language>();
-			Set<ProductDescription> descriptions = new HashSet<ProductDescription>();
-			if(!CollectionUtils.isEmpty(source.getDescriptions())) {
-				for(com.salesmanager.shop.model.catalog.product.ProductDescription description : source.getDescriptions()) {
+			List<Language> languages = new ArrayList<>();
+			Set<ProductDescription> descriptions = new HashSet<>();
+			if (!CollectionUtils.isEmpty(source.getDescriptions())) {
+				for (com.salesmanager.shop.model.catalog.product.ProductDescription description : source.getDescriptions()) {
 
-				  ProductDescription productDescription = new ProductDescription();
-				  Language lang = languageService.getByCode(description.getLanguage());
-	              if(lang==null) {
-	                    throw new ConversionException("Language code " + description.getLanguage() + " is invalid, use ISO code (en, fr ...)");
-	               }
-				   if(!CollectionUtils.isEmpty(target.getDescriptions())) {
-				      for(ProductDescription desc : target.getDescriptions()) {
-				        if(desc.getLanguage().getCode().equals(description.getLanguage())) {
-				          productDescription = desc;
-				          break;
-				        }
-				      }
-				    }
+					ProductDescription productDescription = new ProductDescription();
+					Language lang = languageService.getByCode(description.getLanguage());
+					if (lang == null) {
+						throw new ConversionException("Language code " + description.getLanguage() + " is invalid, use ISO code (en, fr ...)");
+					}
+					if (!CollectionUtils.isEmpty(target.getDescriptions())) {
+						for (ProductDescription desc : target.getDescriptions()) {
+							if (desc.getLanguage().getCode().equals(description.getLanguage())) {
+								productDescription = desc;
+								break;
+							}
+						}
+					}
 
 					productDescription.setProduct(target);
 					productDescription.setDescription(description.getDescription());
@@ -161,55 +154,48 @@ public class PersistableProductPopulator extends
 			}
 
 			if(source.getProductSpecifications()!=null) {
-    			target.setProductHeight(source.getProductSpecifications().getHeight());
-    			target.setProductLength(source.getProductSpecifications().getLength());
-    			target.setProductWeight(source.getProductSpecifications().getWeight());
-    			target.setProductWidth(source.getProductSpecifications().getWidth());
-
-
-    	         if(source.getProductSpecifications().getManufacturer()!=null) {
-
-                   Manufacturer manuf = null;
-                   if(!StringUtils.isBlank(source.getProductSpecifications().getManufacturer())) {
-                       manuf = manufacturerService.getByCode(store, source.getProductSpecifications().getManufacturer());
-                   }
-
-                   if(manuf==null) {
-                       throw new ConversionException("Invalid manufacturer id");
-                   }
-                   if(manuf!=null) {
-                       if(manuf.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-                           throw new ConversionException("Invalid manufacturer id");
-                       }
-                       target.setManufacturer(manuf);
-                   }
-               }
+				target.setProductHeight(source.getProductSpecifications().getHeight());
+				target.setProductLength(source.getProductSpecifications().getLength());
+				target.setProductWeight(source.getProductSpecifications().getWeight());
+				target.setProductWidth(source.getProductSpecifications().getWidth());
+				if (source.getProductSpecifications().getManufacturer() != null) {
+					Manufacturer manufacturer = null;
+					if (!StringUtils.isBlank(source.getProductSpecifications().getManufacturer())) {
+						manufacturer = manufacturerService.getByCode(store, source.getProductSpecifications().getManufacturer());
+					}
+					if (manufacturer == null) {
+						throw new ConversionException("Invalid manufacturer id");
+					}
+					if (manufacturer.getMerchantStore().getId().intValue() != store.getId().intValue()) {
+						throw new ConversionException("Invalid manufacturer id");
+					}
+					target.setManufacturer(manufacturer);
+				}
 
 			}
 			target.setSortOrder(source.getSortOrder());
 			target.setProductVirtual(source.isProductVirtual());
 			target.setProductShipeable(source.isProductShipeable());
 			if(source.getRating() != null) {
-				target.setProductReviewAvg(new BigDecimal(source.getRating()));
+				target.setProductReviewAvg(BigDecimal.valueOf(source.getRating()));
 			}
 			target.setProductReviewCount(source.getRatingCount());
 
 			if(CollectionUtils.isNotEmpty(source.getProductPrices())) {
 
 				//get product availability
+				//create new ProductAvailability
+				ProductAvailability productAvailability = new ProductAvailability(target, store);
 
-			    //create new ProductAvailability
-			    ProductAvailability productAvailability = new ProductAvailability(target, store);
-
-			    //todo now support for specific regions
-			    productAvailability.setRegion(Constants.ALL_REGIONS);
+				//todo now support for specific regions
+				productAvailability.setRegion(Constants.ALL_REGIONS);
 
 				productAvailability.setProductQuantity(source.getQuantity());
 				productAvailability.setProductQuantityOrderMin(1);
 				productAvailability.setProductQuantityOrderMax(1);
-				productAvailability.setAvailable(Boolean.valueOf(target.isAvailable()));
+				productAvailability.setAvailable(target.isAvailable());
 
-				for(com.salesmanager.shop.model.catalog.product.PersistableProductPrice priceEntity : source.getProductPrices()) {
+				for (com.salesmanager.shop.model.catalog.product.PersistableProductPrice priceEntity : source.getProductPrices()) {
 
 					ProductPrice price = new ProductPrice();
 					price.setProductAvailability(productAvailability);
@@ -235,64 +221,61 @@ public class PersistableProductPopulator extends
 
 						//price appender
 						Optional<com.salesmanager.shop.model.catalog.product.ProductPriceDescription> description = priceEntity.getDescriptions().stream().filter(d -> d.getLanguage()!= null && d.getLanguage().equals(lang.getCode())).findFirst();
-						if(description.isPresent()) {
-							ppd.setPriceAppender(description.get().getPriceAppender());
-						}
+						description.ifPresent(productPriceDescription -> ppd.setPriceAppender(productPriceDescription.getPriceAppender()));
 						price.getDescriptions().add(ppd);
 					}
 				}
 
 			} else { //create
 
-			    ProductAvailability productAvailability = null;
-			    ProductPrice defaultPrice = null;
-			    if(!CollectionUtils.isEmpty(target.getAvailabilities())) {
-			      for(ProductAvailability avail : target.getAvailabilities()) {
-    			        Set<ProductPrice> prices = avail.getPrices();
-    			        for(ProductPrice p : prices) {
-    			          if(p.isDefaultPrice()) {
-    			            if(productAvailability == null) {
-    			              productAvailability = avail;
-    			              defaultPrice = p;
-    			              break;
-    			            }
-    			            p.setDefaultPrice(false);
-    			          }
-    			        }
-			      }
-			    }
+				ProductAvailability productAvailability = null;
+				ProductPrice defaultPrice = null;
+				if (!CollectionUtils.isEmpty(target.getAvailabilities())) {
+					for (ProductAvailability avail : target.getAvailabilities()) {
+						Set<ProductPrice> prices = avail.getPrices();
+						for (ProductPrice p : prices) {
+							if (p.isDefaultPrice()) {
+								if (productAvailability == null) {
+									productAvailability = avail;
+									defaultPrice = p;
+									break;
+								}
+								p.setDefaultPrice(false);
+							}
+						}
+					}
+				}
 
-			    if(productAvailability == null) {
-			      productAvailability = new ProductAvailability(target, store);
-			      target.getAvailabilities().add(productAvailability);
-			    }
+				if (productAvailability == null) {
+					productAvailability = new ProductAvailability(target, store);
+					target.getAvailabilities().add(productAvailability);
+				}
 
 				productAvailability.setProductQuantity(source.getQuantity());
 				productAvailability.setProductQuantityOrderMin(1);
 				productAvailability.setProductQuantityOrderMax(1);
 				productAvailability.setRegion(Constants.ALL_REGIONS);
-				productAvailability.setAvailable(Boolean.valueOf(target.isAvailable()));
+				productAvailability.setAvailable(target.isAvailable());
 
 
-				if(defaultPrice != null) {
-				  defaultPrice.setProductPriceAmount(source.getPrice());
+				if (defaultPrice != null) {
+					defaultPrice.setProductPriceAmount(source.getPrice());
 				} else {
-				    defaultPrice = new ProductPrice();
-				    defaultPrice.setDefaultPrice(true);
-				    defaultPrice.setProductPriceAmount(source.getPrice());
-				    defaultPrice.setCode(ProductPriceEntity.DEFAULT_PRICE_CODE);
-				    defaultPrice.setProductAvailability(productAvailability);
-	                productAvailability.getPrices().add(defaultPrice);
-	                for(Language lang : languages) {
+					defaultPrice = new ProductPrice();
+					defaultPrice.setDefaultPrice(true);
+					defaultPrice.setProductPriceAmount(source.getPrice());
+					defaultPrice.setCode(ProductPriceEntity.DEFAULT_PRICE_CODE);
+					defaultPrice.setProductAvailability(productAvailability);
+					productAvailability.getPrices().add(defaultPrice);
+					for (Language lang : languages) {
 
-                      ProductPriceDescription ppd = new ProductPriceDescription();
-                      ppd.setProductPrice(defaultPrice);
-                      ppd.setLanguage(lang);
-                      ppd.setName(ProductPriceDescription.DEFAULT_PRICE_DESCRIPTION);
-                      defaultPrice.getDescriptions().add(ppd);
-                    }
+						ProductPriceDescription ppd = new ProductPriceDescription();
+						ppd.setProductPrice(defaultPrice);
+						ppd.setLanguage(lang);
+						ppd.setName(ProductPriceDescription.DEFAULT_PRICE_DESCRIPTION);
+						defaultPrice.getDescriptions().add(ppd);
+					}
 				}
-
 
 
 			}
@@ -330,33 +313,34 @@ public class PersistableProductPopulator extends
 
 
 			//categories
-			if(!CollectionUtils.isEmpty(source.getCategories())) {
-				for(com.salesmanager.shop.model.catalog.category.Category categ : source.getCategories()) {
-
-					Category c = null;
-					if(!StringUtils.isBlank(categ.getCode())) {
-						c = categoryService.getByCode(store, categ.getCode());
-					} else {
-						Validate.notNull(categ.getId(), "Category id nust not be null");
-						c = categoryService.getById(categ.getId(), store.getId());
-					}
-
-					if(c==null) {
-						throw new ConversionException("Category id " + categ.getId() + " does not exist");
-					}
-					if(c.getMerchantStore().getId().intValue()!=store.getId().intValue()) {
-						throw new ConversionException("Invalid category id");
-					}
-					target.getCategories().add(c);
-				}
-			}
-			return target;
+			return getProduct(target, store, source.getCategories(), categoryService, source);
 
 		} catch (Exception e) {
 			throw new ConversionException(e);
 		}
 	}
 
+	public static Product getProduct(Product target, MerchantStore store, List<com.salesmanager.shop.model.catalog.category.Category> categories, CategoryService categoryService, PersistableProduct source) throws ServiceException, ConversionException {
+		if (!CollectionUtils.isEmpty(categories)) {
+			for (com.salesmanager.shop.model.catalog.category.Category category : categories) {
+				Category c;
+				if (!StringUtils.isBlank(category.getCode())) {
+					c = categoryService.getByCode(store, category.getCode());
+				} else {
+					Validate.notNull(category.getId(), "Category id nust not be null");
+					c = categoryService.getById(category.getId(), store.getId());
+				}
+				if (c == null) {
+					throw new ConversionException("Category id " + category.getId() + " does not exist");
+				}
+				if (c.getMerchantStore().getId().intValue() != store.getId().intValue()) {
+					throw new ConversionException("Invalid category id");
+				}
+				target.getCategories().add(c);
+			}
+		}
+		return target;
+	}
 
 
 	public void setCategoryService(CategoryService categoryService) {
@@ -416,11 +400,9 @@ public class PersistableProductPopulator extends
 	}
 
 
-
 	public CustomerService getCustomerService() {
 		return customerService;
 	}
-
 
 
 	public void setCustomerService(CustomerService customerService) {

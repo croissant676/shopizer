@@ -30,7 +30,7 @@ public class PersistableTaxClassMapper implements Mapper<PersistableTaxClass, Ta
 		Validate.notNull(store, "MerchantStore cannot be null");
 		
 		destination.setCode(source.getCode());
-		if(source.getId()!=null && source.getId().longValue() > 0) {
+		if(source.getId()!=null && source.getId() > 0) {
 			destination.setId(source.getId());
 		}
 		destination.setMerchantStore(store);

@@ -1,5 +1,15 @@
 package com.salesmanager.shop.application.config;
 
+import com.salesmanager.shop.admin.security.UserAuthenticationSuccessHandler;
+import com.salesmanager.shop.admin.security.WebUserServices;
+import com.salesmanager.shop.store.controller.customer.facade.CustomerFacade;
+import com.salesmanager.shop.store.security.AuthenticationTokenFilter;
+import com.salesmanager.shop.store.security.ServicesAuthenticationSuccessHandler;
+import com.salesmanager.shop.store.security.admin.JWTAdminAuthenticationProvider;
+import com.salesmanager.shop.store.security.admin.JWTAdminServicesImpl;
+import com.salesmanager.shop.store.security.customer.JWTCustomerAuthenticationProvider;
+import com.salesmanager.shop.store.security.services.CredentialsService;
+import com.salesmanager.shop.store.security.services.CredentialsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,22 +29,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.salesmanager.shop.admin.security.UserAuthenticationSuccessHandler;
-import com.salesmanager.shop.admin.security.WebUserServices;
-import com.salesmanager.shop.store.controller.customer.facade.CustomerFacade;
-import com.salesmanager.shop.store.security.AuthenticationTokenFilter;
-import com.salesmanager.shop.store.security.ServicesAuthenticationSuccessHandler;
-import com.salesmanager.shop.store.security.admin.JWTAdminAuthenticationProvider;
-import com.salesmanager.shop.store.security.admin.JWTAdminServicesImpl;
-import com.salesmanager.shop.store.security.customer.JWTCustomerAuthenticationProvider;
-import com.salesmanager.shop.store.security.services.CredentialsService;
-import com.salesmanager.shop.store.security.services.CredentialsServiceImpl;
-
 /**
  * Main entry point for security - admin - customer - auth - private - services
- * 
  * @author dur9213
- *
  */
 @Configuration
 @EnableWebSecurity
@@ -108,7 +105,6 @@ public class MultipleEntryPointsSecurityConfig {
 			web.ignoring().antMatchers("/services/public/**");
 		}
 
-
 		@Override
 		public void configure(AuthenticationManagerBuilder auth) throws Exception {
 			auth.userDetailsService(customerDetailsService);
@@ -116,8 +112,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http
-			.antMatcher("/shop/**")
+			http.antMatcher("/shop/**")
 			.csrf().disable()			
 			.authorizeRequests()
 					.antMatchers("/shop/").permitAll()
@@ -142,7 +137,6 @@ public class MultipleEntryPointsSecurityConfig {
 					.invalidateHttpSession(false)
 					.and()
 					.exceptionHandling().accessDeniedPage("/shop/");
-
 		}
 
 		@Bean
@@ -156,10 +150,8 @@ public class MultipleEntryPointsSecurityConfig {
 	
 	/**
 	 * services api v0
-	 * 
 	 * @author dur9213
 	 * @deprecated
-	 *
 	 */
 	@Configuration
 	@Order(2)
@@ -182,8 +174,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http
-			.antMatcher("/services/**")
+			http.antMatcher("/services/**")
 			.csrf().disable()
 					.authorizeRequests()
 					.antMatchers("/services/public/**").permitAll()
@@ -206,9 +197,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 	/**
 	 * admin
-	 * 
 	 * @author dur9213
-	 *
 	 */
 	@Configuration
 	@Order(3)
@@ -235,8 +224,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http
-			.antMatcher("/admin/**")
+			http.antMatcher("/admin/**")
 					.authorizeRequests()
 					.antMatchers("/admin/logon*").permitAll()
 					.antMatchers("/admin/resources/**").permitAll()
@@ -263,8 +251,6 @@ public class MultipleEntryPointsSecurityConfig {
 					.csrf().disable()
 					.logout().logoutUrl("/admin/logout").logoutSuccessUrl("/admin/home.html")
 					.invalidateHttpSession(true).and().exceptionHandling().accessDeniedPage("/admin/denied.html");
-			
-
 		}
 
 		@Bean
@@ -278,9 +264,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 	/**
 	 * api - private
-	 * 
 	 * @author dur9213
-	 *
 	 */
 	@Configuration
 	@Order(5)
@@ -295,11 +279,8 @@ public class MultipleEntryPointsSecurityConfig {
 		@Bean("jwtAdminAuthenticationManager")
 		@Override
 		public AuthenticationManager authenticationManagerBean() throws Exception {
-			AuthenticationManager mgr = super.authenticationManagerBean();
-			return mgr;
+			return super.authenticationManagerBean();
 		}
-		
-		
 
 		public UserApiConfigurationAdapter() {
 			super();
@@ -316,15 +297,13 @@ public class MultipleEntryPointsSecurityConfig {
 		public void configure(WebSecurity web) {
 			web.ignoring().antMatchers("/swagger-ui.html");
 		}
-
 		
 		/**
 		 * Admin user api
 		 */
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http
-					.antMatcher(API_VERSION + "/private/**")
+			http.antMatcher(API_VERSION + "/private/**")
 					.authorizeRequests()
 					.antMatchers(API_VERSION + "/private/login*").permitAll()
 					.antMatchers(API_VERSION + "/private/refresh").permitAll()
@@ -336,7 +315,6 @@ public class MultipleEntryPointsSecurityConfig {
 					.and()
 					.addFilterAfter(authenticationTokenFilter, BasicAuthenticationFilter.class)
 					.csrf().disable();
-
 		}
 		
 	    @Bean
@@ -356,16 +334,13 @@ public class MultipleEntryPointsSecurityConfig {
 	}
 
 
-
 	/**
 	 * customer api
-	 * 
 	 * @author dur9213
-	 *
 	 */
 	@Configuration
 	@Order(6)
-	public static class CustomeApiConfigurationAdapter extends WebSecurityConfigurerAdapter {
+	public static class CustomerApiConfigurationAdapter extends WebSecurityConfigurerAdapter {
 
 		@Autowired
 		private AuthenticationTokenFilter authenticationTokenFilter;
@@ -373,7 +348,7 @@ public class MultipleEntryPointsSecurityConfig {
 		@Autowired
 		private UserDetailsService jwtCustomerDetailsService;
 
-		public CustomeApiConfigurationAdapter() {
+		public CustomerApiConfigurationAdapter() {
 			super();
 		}
 		
@@ -390,9 +365,7 @@ public class MultipleEntryPointsSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			http
-			
-				.antMatcher(API_VERSION + "/auth/**")
+			http.antMatcher(API_VERSION + "/auth/**")
 				.authorizeRequests()
 					.antMatchers(API_VERSION + "/auth/refresh").permitAll()
 					.antMatchers(API_VERSION + "/auth/login").permitAll()
@@ -420,9 +393,5 @@ public class MultipleEntryPointsSecurityConfig {
 			entryPoint.setRealmName("api-customer-realm");
 			return entryPoint;
 		}
-
 	}
-
-
-
 }

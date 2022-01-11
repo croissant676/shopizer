@@ -11,26 +11,26 @@ import java.io.IOException;
 
 public class ServicesAuthenticationEntryPoint implements AuthenticationEntryPoint, InitializingBean, Ordered {
 
-	
-	private String realmName = "services-realm";
-	
-	@Override
-	public void commence( HttpServletRequest request, HttpServletResponse response, 
-			AuthenticationException authException ) throws IOException{
-		response.sendError( HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized" );
-	}
 
-	@Override
-	public int getOrder() {
-		return 0;
-	}
+    private final String realmName = "services-realm";
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		if ((realmName == null) || "".equals(realmName)) {
-			throw new IllegalArgumentException("realmName must be specified");
-		}
-		
-	}
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if ((realmName == null) || "".equals(realmName)) {
+            throw new IllegalArgumentException("realmName must be specified");
+        }
+
+    }
 
 }

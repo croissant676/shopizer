@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class DefaultController {
-	
 
-	@Autowired
-	private Environment env;
-	
-	@GetMapping(value = "/")
-	public @ResponseBody String version(Model model) {
 
-		return "{\"version\":\""+  env.getProperty("application-version")  +"\"}";
-	}
+    @Autowired
+    private Environment env;
+
+    @GetMapping(value = "/")
+    public @ResponseBody
+    String version(Model model) {
+
+        return "{\"version\":\"" + env.getProperty("application-version") + "\"}";
+    }
 
 }

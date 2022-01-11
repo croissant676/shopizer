@@ -648,7 +648,7 @@ public class ShopProductRESTController {
 			
 			ReadableProductPopulator populator = new ReadableProductPopulator();
 			populator.setPricingService(pricingService);
-			populator.setimageUtils(imageUtils);
+			populator.setImageUtils(imageUtils);
 			
 			
 			ReadableProductList productList = new ReadableProductList();

@@ -24,7 +24,6 @@ import com.salesmanager.shop.utils.DateUtil;
 import com.salesmanager.shop.utils.ImageFilePath;
 import com.salesmanager.shop.utils.LabelUtils;
 import com.salesmanager.shop.utils.SanitizeUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -102,8 +100,8 @@ public class CustomerProductReviewController extends AbstractController {
 		ReadableProduct readableProduct = new ReadableProduct();
 		ReadableProductPopulator readableProductPopulator = new ReadableProductPopulator();
 		readableProductPopulator.setPricingService(pricingService);
-		readableProductPopulator.setimageUtils(imageUtils);
-		readableProductPopulator.populate(product, readableProduct, store, language);
+        readableProductPopulator.setImageUtils(imageUtils);
+        readableProductPopulator.populate(product, readableProduct, store, language);
 		model.addAttribute("product", readableProduct);
 
 		Customer customer = customerFacade.getCustomerByUserName(request.getRemoteUser(), store);
@@ -176,9 +174,9 @@ public class CustomerProductReviewController extends AbstractController {
 
 		ReadableProduct readableProduct = new ReadableProduct();
 		ReadableProductPopulator readableProductPopulator = new ReadableProductPopulator();
-		readableProductPopulator.setPricingService(pricingService);
-		readableProductPopulator.setimageUtils(imageUtils);
-		readableProductPopulator.populate(product, readableProduct, store, language);
+        readableProductPopulator.setPricingService(pricingService);
+        readableProductPopulator.setImageUtils(imageUtils);
+        readableProductPopulator.populate(product, readableProduct, store, language);
 		model.addAttribute("product", readableProduct);
 
 		/** template **/

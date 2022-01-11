@@ -1,11 +1,5 @@
 package com.salesmanager.shop.mapper.tax;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.commons.lang3.Validate;
-import org.springframework.stereotype.Component;
-
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.language.Language;
 import com.salesmanager.core.model.tax.taxrate.TaxRate;
@@ -13,6 +7,11 @@ import com.salesmanager.core.model.tax.taxrate.TaxRateDescription;
 import com.salesmanager.shop.mapper.Mapper;
 import com.salesmanager.shop.model.tax.ReadableTaxRate;
 import com.salesmanager.shop.model.tax.ReadableTaxRateDescription;
+import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ReadableTaxRateMapper implements Mapper<TaxRate, ReadableTaxRate> {

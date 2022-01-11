@@ -9,17 +9,17 @@ import com.salesmanager.shop.model.customer.ReadableCustomerReview;
 
 public class ReadableProductReviewPopulator extends AbstractDataPopulator<CustomerReview, ReadableCustomerReview> {
 
-	@Override
-	public ReadableCustomerReview populate(CustomerReview source, ReadableCustomerReview target, MerchantStore store,
-			Language language) throws ConversionException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ReadableCustomerReview populate(CustomerReview source, ReadableCustomerReview target, MerchantStore store,
+                                           Language language) throws ConversionException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	protected ReadableCustomerReview createTarget() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected ReadableCustomerReview createTarget() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }

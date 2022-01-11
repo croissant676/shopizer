@@ -1,19 +1,5 @@
 package com.salesmanager.core.business.services.merchant;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
-import org.jsoup.helper.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.repositories.merchant.MerchantRepository;
 import com.salesmanager.core.business.repositories.merchant.PageableMerchantRepository;
@@ -22,6 +8,16 @@ import com.salesmanager.core.business.services.common.generic.SalesManagerEntity
 import com.salesmanager.core.model.common.GenericEntityList;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.merchant.MerchantStoreCriteria;
+import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.List;
+import java.util.Optional;
 
 @Service("merchantService")
 public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Integer, MerchantStore>
@@ -33,7 +29,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
 	@Autowired
 	private PageableMerchantRepository pageableMerchantRepository;
 
-	private MerchantRepository merchantRepository;
+	private final MerchantRepository merchantRepository;
 
 	@Inject
 	public MerchantStoreServiceImpl(MerchantRepository merchantRepository) {
@@ -48,10 +44,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
 	}
 
 	@Override
-	/**
-	 * cache moved in facades
-	 */
-	//@Cacheable(value = "store")
+	// @Cacheable(value = "store")
 	public MerchantStore getByCode(String code) throws ServiceException {
 		return merchantRepository.findByCode(code);
 	}
@@ -108,23 +101,17 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
 	@Override
 	public MerchantStore getParent(String code) throws ServiceException {
 		Validate.notNull(code, "MerchantStore code cannot be null");
-
-		
 		//get it
 		MerchantStore storeModel = this.getByCode(code);
-		
 		if(storeModel == null) {
 			throw new ServiceException("Store with code [" + code + "] is not found");
 		}
-		
 		if(storeModel.isRetailer() != null && storeModel.isRetailer() && storeModel.getParent() == null) {
 			return storeModel;
 		}
-		
 		if(storeModel.getParent() == null) {
 			return storeModel;
 		}
-	
 		return merchantRepository.getById(storeModel.getParent().getId());
 	}
 
@@ -138,7 +125,7 @@ public class MerchantStoreServiceImpl extends SalesManagerEntityServiceImpl<Inte
 	 * Store might be alone (known as retailer)
 	 * A retailer can have multiple child attached
 	 * 
-	 * This method from a store code is able to retrieve parent and childs.
+	 * This method from a store code is able to retrieve parent and children.
 	 * Method can also filter on storeName
 	 */
 	@Override

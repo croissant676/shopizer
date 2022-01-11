@@ -4,31 +4,31 @@ import javax.validation.constraints.NotEmpty;
 
 public class PasswordRequest extends AuthenticationRequest {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-  @NotEmpty(message = "{message.password.required}")
-  private String current;
-  
-  @NotEmpty(message = "{message.password.required}")
-  private String repeatPassword;
+    @NotEmpty(message = "{message.password.required}")
+    private String current;
 
-  public String getCurrent() {
-    return current;
-  }
+    @NotEmpty(message = "{message.password.required}")
+    private String repeatPassword;
 
-  public void setCurrent(String current) {
-    this.current = current;
-  }
+    public String getCurrent() {
+        return current;
+    }
 
-  public String getRepeatPassword() {
-    return repeatPassword;
-  }
+    public void setCurrent(String current) {
+        this.current = current;
+    }
 
-  public void setRepeatPassword(String repeatPassword) {
-    this.repeatPassword = repeatPassword;
-  }
+    public String getRepeatPassword() {
+        return repeatPassword;
+    }
+
+    public void setRepeatPassword(String repeatPassword) {
+        this.repeatPassword = repeatPassword;
+    }
 
 }
